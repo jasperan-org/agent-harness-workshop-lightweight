@@ -21,7 +21,7 @@ mkdir -p "$LOG_DIR"
 # 1. Oracle
 # -----------------------------------------------------------------------------
 echo ""
-echo "[1/4] Ensuring Oracle is running..."
+echo "[1/5] Ensuring Oracle is running..."
 if ! docker ps --format '{{.Names}}' | grep -q '^oracle-free$'; then
   if docker ps -a --format '{{.Names}}' | grep -q '^oracle-free$'; then
     echo "  oracle-free exists but stopped — starting..."
@@ -56,7 +56,7 @@ fi
 #     where setup_runtime.sh failed half-way through.)
 # -----------------------------------------------------------------------------
 echo ""
-echo "[2/4] Checking that AGENT user + ONNX embedder exist..."
+echo "[2/5] Checking that AGENT user + ONNX embedder exist..."
 
 python3 - <<'PYEOF'
 import sys
@@ -96,7 +96,7 @@ fi
 # 3. Backend
 # -----------------------------------------------------------------------------
 echo ""
-echo "[3/4] Starting agent backend on :8000 (logs → $LOG_DIR/backend.log)..."
+echo "[3/5] Starting agent backend on :8000 (logs → $LOG_DIR/backend.log)..."
 
 pkill -f "python app.py" 2>/dev/null
 sleep 1
@@ -137,10 +137,44 @@ if [ $BACKEND_OK -eq 0 ] && kill -0 "$BACKEND_PID" 2>/dev/null; then
 fi
 
 # -----------------------------------------------------------------------------
-# 4. Frontend
+# 4. Total Recall AppBook
 # -----------------------------------------------------------------------------
 echo ""
-echo "[4/4] Starting agent UI on :3000 (logs → $LOG_DIR/frontend.log)..."
+echo "[4/5] Starting Total Recall AppBook on :8001 (logs → $LOG_DIR/appbook.log)..."
+
+pkill -f "backend.main:app.*8001" 2>/dev/null
+cd "$WORKSPACE/appbook"
+setsid nohup env HOST=0.0.0.0 PORT=8001 bash ./run.sh > "$LOG_DIR/appbook.log" 2>&1 < /dev/null &
+APPBOOK_PID=$!
+disown $APPBOOK_PID 2>/dev/null || true
+cd "$WORKSPACE"
+echo "  AppBook PID: $APPBOOK_PID"
+
+APPBOOK_OK=0
+for i in $(seq 1 30); do
+  if curl -sf http://localhost:8001/api/health > /dev/null 2>&1; then
+    echo "  AppBook ready (${i}s)."
+    APPBOOK_OK=1
+    break
+  fi
+  if ! kill -0 "$APPBOOK_PID" 2>/dev/null; then
+    echo "  WARNING: AppBook process exited. Last 40 lines:"
+    tail -40 "$LOG_DIR/appbook.log" | sed "s/^/    /"
+    break
+  fi
+  sleep 1
+done
+
+if [ $APPBOOK_OK -eq 0 ] && kill -0 "$APPBOOK_PID" 2>/dev/null; then
+  echo "  WARNING: AppBook has not answered /api/health within 30s."
+  tail -20 "$LOG_DIR/appbook.log" | sed "s/^/    /"
+fi
+
+# -----------------------------------------------------------------------------
+# 5. Frontend
+# -----------------------------------------------------------------------------
+echo ""
+echo "[5/5] Starting agent UI on :3000 (logs → $LOG_DIR/frontend.log)..."
 
 # node_modules may not exist on a fresh container.
 if [ ! -d "$WORKSPACE/app/frontend/node_modules" ]; then
@@ -221,6 +255,7 @@ echo "============================================"
 echo "  Status:"
 echo "    Oracle:   $([ $ORACLE_OK   -eq 1 ] && echo OK || echo FAIL)"
 echo "    Backend:  $([ $BACKEND_OK  -eq 1 ] && echo OK || echo 'NOT READY (check log)')"
+echo "    AppBook:  $([ $APPBOOK_OK  -eq 1 ] && echo OK || echo 'NOT READY (check log)')"
 echo "    Frontend: $([ $FRONTEND_OK -eq 1 ] && echo OK || echo 'NOT READY (check log)')"
 echo ""
 echo "  • Frontend (UI):   http://localhost:3000   (auto-forwarded by Codespaces)"
@@ -228,8 +263,9 @@ if [ -n "$PUBLIC_UI_URL" ]; then
   echo "    Public URL:      $PUBLIC_UI_URL"
 fi
 echo "  • Backend (API):   http://localhost:8000"
+echo "  • AppBook:         http://localhost:8001   (layer-by-layer demo)"
 echo "  • Notebook:        notebook_student.ipynb"
 echo ""
-echo "  Logs:              $LOG_DIR/{backend,frontend,npm-install,bootstrap,seed,setup_advanced}.log"
+echo "  Logs:              $LOG_DIR/{backend,appbook,frontend,npm-install,bootstrap,seed,setup_advanced}.log"
 echo "  Restart manually:  bash .devcontainer/start_app.sh"
 echo "============================================"

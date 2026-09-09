@@ -23,11 +23,12 @@
   // races vite's bootup, shows "can't connect", and never re-fires when vite
   // actually binds. Leaving 3000 out lets Codespaces auto-detect it the
   // instant vite starts listening, which is when we actually want the preview
-  // to open. 1521 and 8000 stay pre-forwarded because they're "silent" anyway.
-  "forwardPorts": [1521, 8000],
+  // to open. 1521, 8000, and 8001 stay pre-forwarded because they're "silent" anyway.
+  "forwardPorts": [1521, 8000, 8001],
   "portsAttributes": {
     "1521": { "label": "Oracle DB", "onAutoForward": "silent" },
     "8000": { "label": "Agent Backend (Flask)", "onAutoForward": "silent" },
+    "8001": { "label": "Total Recall AppBook", "onAutoForward": "silent" },
     "3000": { "label": "Agent UI (Vite)", "onAutoForward": "openPreview" }
   },
 

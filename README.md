@@ -8,13 +8,15 @@
 
 ## What You Will Build (and Run)
 
-> **From notebook concept to running application.** You build the harness in the notebook, primitive by primitive. The Codespace already has the *same* harness running as a Flask + React app on the *same* Oracle — open it at [http://localhost:3000](http://localhost:3000) and watch the concept you're coding become a live product. The notebook teaches the pattern; the app shows it deployed.
+> **From notebook concept to two working applications.** The Codespace runs the Flask + React enterprise chat UI at [http://localhost:3000](http://localhost:3000) and the layer-by-layer Total Recall AppBook at [http://localhost:8001](http://localhost:8001). The notebook teaches the pattern; the applications make it tangible.
 
-This workshop is two halves of the same thing:
+This workshop has three complementary views of the same agent-harness ideas:
 
 1. **The notebook** (`notebook_student.ipynb`) — you build the harness from primitives. Long-term memory via OAMP, hybrid vector + Oracle Text retrieval, an HNSW-indexed `toolbox`, the `agent_turn` loop, JSON Relational Duality Views, tool-output offload. **9 focused coding TODOs across 11 parts**, ~1 hour.
 
 2. **The app** (`app/`) — a Flask + React reference deployment of the *same* harness against the *same* Oracle, same OAMP store, same `toolbox` and `skillbox` the notebook populates. Chat UI on the left, live-updating memory pane on the right, 3D globe the agent can drive via tool calls. The Codespace boots the app for you on first launch and auto-opens the browser preview at `http://localhost:3000` — every harness piece you build in the notebook is wired up live in this app.
+
+3. **The AppBook** (`appbook/`) — the original Total Recall layer-by-layer experience. Each chapter explains and lets attendees directly exercise a harness component: models, scratchpad, retrieval, OAMP memory, semantic grounding, skills, automations, the agent loop, and context engineering. It starts alongside the chat UI on `http://localhost:8001`.
 
 The notebook is **11 parts with 9 hands-on coding TODOs**. Every "true setup" task — `AGENT` user creation, vector memory allocation, ONNX model loading, the `SUPPLYCHAIN` seed, JSON Relational Duality View DDL — is run by the Codespace **before** you open the notebook (`app/scripts/bootstrap.py`, `seed.py`, `setup_advanced.py`). Each TODO has a hard-stop assert below it so a broken implementation surfaces immediately. Three notebooks ship:
 
@@ -36,8 +38,9 @@ The whole loop is roughly 300 lines of Python; the rest is database primitives.
 | 2 | Read the [Part 1 guide](docs/part-1-setup.md), then open `notebook_student.ipynb` | Notebook |
 | 3 | Work through TODOs 1–9 — each has a hard-stop assert below it | Notebook |
 | 4 | Open the running chat UI at `http://localhost:3000` | Browser preview |
-| 5 | Try the starter prompts (below) — every harness piece you just built is wired up live | Browser preview |
-| 6 | Read [`app/README.md`](app/README.md) for the full app architecture | Browser |
+| 5 | Open the Total Recall AppBook at `http://localhost:8001` and work through its layer-by-layer probes | Browser / Ports tab |
+| 6 | Try the starter prompts (below) — every harness piece you just built is wired up live | Browser preview |
+| 7 | Read [`app/README.md`](app/README.md) and [`appbook/README.md`](appbook/README.md) for both application architectures | Browser |
 
 ## Workshop Parts
 
@@ -69,11 +72,12 @@ The whole loop is roughly 300 lines of Python; the rest is database primitives.
 
    - `setup_build.sh` — installs Python deps (workshop notebook + app backend) and `npm install` for the frontend.
    - `setup_runtime.sh` — boots Oracle, runs `app/scripts/bootstrap.py` (AGENT user, vector pool, ONNX embedder, DBFS), then `app/scripts/seed.py` (SUPPLYCHAIN, duality views, ingest `oracle/skills` into the skillbox).
-   - `start_app.sh` — starts the Flask backend on `:8000` and the Vite dev server on `:3000`.
+   - `start_app.sh` — starts the Flask backend on `:8000`, the AppBook on `:8001`, and the Vite dev server on `:3000`.
 
    ![Codespace startup](images/codespace_startup.png)
 
 4. **The app opens automatically** in a browser preview on port 3000 (`portsAttributes.3000.onAutoForward = "openPreview"`). If it doesn\'t, click the **PORTS** tab at the bottom of VS Code and open the forwarded port 3000 URL.
+   The **Total Recall AppBook** is also running on port 8001. Open **PORTS**, find **Total Recall AppBook**, and open its forwarded URL to exercise individual harness components.
 
 5. Verify Oracle is healthy (in the terminal):
 
@@ -139,6 +143,7 @@ docker compose -f .devcontainer/docker-compose.yml up -d oracle
 # 2. Install workshop notebook deps + app backend deps
 pip install -r requirements.txt
 pip install -r app/backend/requirements.txt
+pip install -r appbook/requirements.txt
 
 # 3. Configure secrets
 cp app/.env.example app/.env       # OCI is the default — fill OCI_GENAI_API_KEY
@@ -188,6 +193,7 @@ cd app/frontend && npm run dev
 ```
 
 Open `http://localhost:3000`.
+For the component-by-component walkthrough, also open `http://localhost:8001`.
 
 ### Starter prompts
 
@@ -206,6 +212,7 @@ Drop these into the chat to exercise different parts of the harness you just bui
 The right-hand pane fills in after every turn — top semantic memories, recent tool outputs, skill manifest, token usage. That\'s the same OAMP store you populated in Part 2 of the notebook.
 
 For full app docs, see [`app/README.md`](app/README.md).
+For the AppBook chapters and standalone configuration, see [`appbook/README.md`](appbook/README.md).
 
 ## Workshop Files
 
@@ -241,6 +248,11 @@ agent-harness-workshop-lightweight/
 │       ├── bootstrap.py            AGENT user, vector pool, ONNX, DBFS, empty toolbox/skillbox
 │       ├── seed.py                 SUPPLYCHAIN schema + duality views + skillbox ingestion + scan
 │       └── setup_advanced.py       Oracle Text index
+├── appbook/                        Total Recall layer-by-layer AppBook (FastAPI + vanilla JS)
+│   ├── README.md                   AppBook chapters and configuration
+│   ├── run.sh                      Runs on :8001 by default
+│   ├── backend/                    FastAPI component-probe APIs + harness
+│   └── frontend/                   Dependency-free AppBook SPA
 ├── images/                         Architecture diagrams + screenshots
 ├── enterprise_data_agent.ipynb     Original source notebook (181 cells; mirrored by notebook_complete_with_setup_code.ipynb)
 ├── requirements.txt                Workshop notebook deps

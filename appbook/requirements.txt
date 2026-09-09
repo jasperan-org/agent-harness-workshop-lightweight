@@ -1,0 +1,12 @@
+# Total Recall appbook — backend dependencies.
+# Install into a Python virtual environment or a conda env: pip install -r requirements.txt
+fastapi>=0.110
+uvicorn>=0.27
+sse-starlette>=2.0
+python-dotenv>=1.0
+openai>=1.50
+oracledb>=3.0
+oracleagentmemory>=26.0
+langchain-oracledb>=1.5
+numpy>=1.26
+requests>=2.31
