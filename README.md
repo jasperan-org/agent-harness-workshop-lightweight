@@ -8,15 +8,14 @@
 
 ## What You Will Build (and Run)
 
-> **From notebook concept to two working applications.** The Codespace runs the Flask + React enterprise chat UI at [http://localhost:3000](http://localhost:3000) and the layer-by-layer Total Recall AppBook at [http://localhost:8001](http://localhost:8001). The notebook teaches the pattern; the applications make it tangible.
+> **From notebook concept to a working AppBook.** The Codespace runs the original Total Recall layer-by-layer AppBook at [http://localhost:8000](http://localhost:8000). The notebook teaches the pattern; the AppBook lets attendees exercise each harness component live.
 
-This workshop has three complementary views of the same agent-harness ideas:
+This workshop has two complementary views of the same agent-harness ideas:
 
 1. **The notebook** (`notebook_student.ipynb`) — you build the harness from primitives. Long-term memory via OAMP, hybrid vector + Oracle Text retrieval, an HNSW-indexed `toolbox`, the `agent_turn` loop, JSON Relational Duality Views, tool-output offload. **9 focused coding TODOs across 11 parts**, ~1 hour.
 
-2. **The app** (`app/`) — a Flask + React reference deployment of the *same* harness against the *same* Oracle, same OAMP store, same `toolbox` and `skillbox` the notebook populates. Chat UI on the left, live-updating memory pane on the right, 3D globe the agent can drive via tool calls. The Codespace boots the app for you on first launch and auto-opens the browser preview at `http://localhost:3000` — every harness piece you build in the notebook is wired up live in this app.
+2. **The AppBook** (`app/`) — the original Total Recall AppBook from `jasperan-org/agent-harness-workshop`: a FastAPI + dependency-free JavaScript application organised by harness layer. It provides live probes for foundation models, DB-backed scratch storage, retrieval, OAMP memory, semantic grounding, skills and automations, the agent loop, and context engineering.
 
-3. **The AppBook** (`appbook/`) — the original Total Recall layer-by-layer experience. Each chapter explains and lets attendees directly exercise a harness component: models, scratchpad, retrieval, OAMP memory, semantic grounding, skills, automations, the agent loop, and context engineering. It starts alongside the chat UI on `http://localhost:8001`.
 
 The notebook is **11 parts with 9 hands-on coding TODOs**. Every "true setup" task — `AGENT` user creation, vector memory allocation, ONNX model loading, the `SUPPLYCHAIN` seed, JSON Relational Duality View DDL — is run by the Codespace **before** you open the notebook (`app/scripts/bootstrap.py`, `seed.py`, `setup_advanced.py`). Each TODO has a hard-stop assert below it so a broken implementation surfaces immediately. Three notebooks ship:
 
@@ -37,10 +36,9 @@ The whole loop is roughly 300 lines of Python; the rest is database primitives.
 | 1 | Wait for the Codespace to finish auto-bootstrapping (Oracle, ONNX models, SUPPLYCHAIN seed, duality views, skillbox, app) | Codespace terminal |
 | 2 | Read the [Part 1 guide](docs/part-1-setup.md), then open `notebook_student.ipynb` | Notebook |
 | 3 | Work through TODOs 1–9 — each has a hard-stop assert below it | Notebook |
-| 4 | Open the running chat UI at `http://localhost:3000` | Browser preview |
-| 5 | Open the Total Recall AppBook at `http://localhost:8001` and work through its layer-by-layer probes | Browser / Ports tab |
+| 4 | Open the Total Recall AppBook at `http://localhost:8000` and work through its layer-by-layer probes | Browser preview |
 | 6 | Try the starter prompts (below) — every harness piece you just built is wired up live | Browser preview |
-| 7 | Read [`app/README.md`](app/README.md) and [`appbook/README.md`](appbook/README.md) for both application architectures | Browser |
+| 6 | Read [`app/README.md`](app/README.md) for the AppBook architecture | Browser |
 
 ## Workshop Parts
 
@@ -72,12 +70,11 @@ The whole loop is roughly 300 lines of Python; the rest is database primitives.
 
    - `setup_build.sh` — installs Python deps (workshop notebook + app backend) and `npm install` for the frontend.
    - `setup_runtime.sh` — boots Oracle, runs `app/scripts/bootstrap.py` (AGENT user, vector pool, ONNX embedder, DBFS), then `app/scripts/seed.py` (SUPPLYCHAIN, duality views, ingest `oracle/skills` into the skillbox).
-   - `start_app.sh` — starts the Flask backend on `:8000`, the AppBook on `:8001`, and the Vite dev server on `:3000`.
+   - `start-app.sh` — starts the Total Recall AppBook on `:8000`.
 
    ![Codespace startup](images/codespace_startup.png)
 
-4. **The app opens automatically** in a browser preview on port 3000 (`portsAttributes.3000.onAutoForward = "openPreview"`). If it doesn\'t, click the **PORTS** tab at the bottom of VS Code and open the forwarded port 3000 URL.
-   The **Total Recall AppBook** is also running on port 8001. Open **PORTS**, find **Total Recall AppBook**, and open its forwarded URL to exercise individual harness components.
+4. **The AppBook opens automatically** in a browser preview on port 8000. If it does not, open the forwarded **Total Recall appbook** port from the **PORTS** tab.
 
 5. Verify Oracle is healthy (in the terminal):
 
@@ -97,11 +94,11 @@ The whole loop is roughly 300 lines of Python; the rest is database primitives.
 
 8. When you finish the notebook, head to the **app preview tab** at `http://localhost:3000` and try the starter prompts below. Every harness piece you just built is wired up there.
 
-> **First-run note:** The first auto-bootstrap can take 5–8 minutes (Oracle Free image is ~3 GB and the ONNX embedder is ~117 MB). Subsequent Codespace opens are ~30 seconds — `start_app.sh` just brings the app back up against the existing Oracle volume.
+> **First-run note:** The first auto-bootstrap can take 5–8 minutes (Oracle Free image is ~3 GB and the ONNX embedder is ~117 MB). Subsequent Codespace opens are ~30 seconds — `start-app.sh` just brings the app back up against the existing Oracle volume.
 
 ### App preview shows "HTTP ERROR 502" or "This page isn't working"
 
-`502` from `*.app.github.dev:3000` means port 3000 isn't serving yet — either the Vite dev server hasn't bound, the Flask backend (`:8000`) crashed during init, or you clicked the preview before `start_app.sh` finished. In a Codespace terminal:
+`502` from `*.app.github.dev:8000` means the Total Recall AppBook is not serving yet. Restart it with `bash .devcontainer/start-app.sh` and inspect `/tmp/total-recall-app.log`. In a Codespace terminal:
 
 ```bash
 # What's actually running?
@@ -112,21 +109,21 @@ tail -60 .devcontainer/logs/backend.log
 tail -40 .devcontainer/logs/frontend.log
 
 # Most-common fix — just re-run the start script
-bash .devcontainer/start_app.sh
+bash .devcontainer/start-app.sh
 ```
 
 If the backend log shows an Oracle connection error, the bootstrap step probably didn't finish:
 
 ```bash
 bash .devcontainer/setup_runtime.sh    # idempotent — re-runs bootstrap + seed + advanced setup
-bash .devcontainer/start_app.sh
+bash .devcontainer/start-app.sh
 ```
 
 If the backend log shows `OPENAI_API_KEY is None` or an `AuthenticationError`, the Codespace doesn't have an LLM key set. Add one:
 
 ```bash
 echo 'OPENAI_API_KEY=sk-...' >> app/.env
-bash .devcontainer/start_app.sh
+bash .devcontainer/start-app.sh
 ```
 
 For permanent fixes, add `OPENAI_API_KEY` (or `OCI_GENAI_API_KEY`) as a [Codespaces secret](https://github.com/settings/codespaces) and rebuild the Codespace.
@@ -143,7 +140,7 @@ docker compose -f .devcontainer/docker-compose.yml up -d oracle
 # 2. Install workshop notebook deps + app backend deps
 pip install -r requirements.txt
 pip install -r app/backend/requirements.txt
-pip install -r appbook/requirements.txt
+pip install -r app/requirements.txt
 
 # 3. Configure secrets
 cp app/.env.example app/.env       # OCI is the default — fill OCI_GENAI_API_KEY
@@ -156,14 +153,13 @@ python scripts/setup_advanced.py   # Oracle Text index
 cd ..
 
 # 5. Install the frontend
-cd app/frontend && npm install && cd ../..
 
 # 6a. Run the notebook
 jupyter lab notebook_student.ipynb
 
 # 6b. (When you finish the notebook) start the app — two terminals
 cd app/backend && python app.py            # backend  → :8000
-cd app/frontend && npm run dev             # frontend → :3000
+cd app && ./run.sh                    # AppBook → :8000
 ```
 
 
@@ -189,11 +185,10 @@ The Codespace starts the app for you automatically. If you stopped it or you\'re
 cd app/backend && python app.py
 
 # Terminal 2
-cd app/frontend && npm run dev
+cd app && ./run.sh                    # AppBook → :8000
 ```
 
 Open `http://localhost:3000`.
-For the component-by-component walkthrough, also open `http://localhost:8001`.
 
 ### Starter prompts
 
@@ -212,7 +207,6 @@ Drop these into the chat to exercise different parts of the harness you just bui
 The right-hand pane fills in after every turn — top semantic memories, recent tool outputs, skill manifest, token usage. That\'s the same OAMP store you populated in Part 2 of the notebook.
 
 For full app docs, see [`app/README.md`](app/README.md).
-For the AppBook chapters and standalone configuration, see [`appbook/README.md`](appbook/README.md).
 
 ## Workshop Files
 
@@ -223,7 +217,7 @@ agent-harness-workshop-lightweight/
 │   ├── docker-compose.yml          Oracle Free 23-slim
 │   ├── setup_build.sh              onCreate — pip + npm installs
 │   ├── setup_runtime.sh            postCreate — Oracle + bootstrap + seed + advanced setup
-│   └── start_app.sh                postStart — backend + frontend in background
+│   └── start-app.sh                postStart — backend + frontend in background
 ├── notebook_student.ipynb              Your working notebook (9 TODO stubs + asserts)
 ├── notebook_complete.ipynb             TODO solutions filled in
 ├── notebook_complete_with_setup_code.ipynb   Full source including Oracle DDL
@@ -239,20 +233,16 @@ agent-harness-workshop-lightweight/
 │   ├── part-11-tool-output-offload.md
 │   ├── TODO-checklist.md
 │   └── troubleshooting.md
-├── app/                            Flask + React reference deployment
+├── app/                            Original Total Recall AppBook (FastAPI + vanilla JS)
 │   ├── README.md                   Full app architecture
 │   ├── .env.example                Copy to .env and fill in keys
-│   ├── backend/                    Flask + Socket.IO + the harness
-│   ├── frontend/                   React + Vite + Tailwind UI
+│   ├── backend/                    FastAPI harness and component-probe APIs
+│   └── frontend/                   Dependency-free AppBook SPA
 │   └── scripts/
 │       ├── bootstrap.py            AGENT user, vector pool, ONNX, DBFS, empty toolbox/skillbox
 │       ├── seed.py                 SUPPLYCHAIN schema + duality views + skillbox ingestion + scan
 │       └── setup_advanced.py       Oracle Text index
-├── appbook/                        Total Recall layer-by-layer AppBook (FastAPI + vanilla JS)
-│   ├── README.md                   AppBook chapters and configuration
-│   ├── run.sh                      Runs on :8001 by default
-│   ├── backend/                    FastAPI component-probe APIs + harness
-│   └── frontend/                   Dependency-free AppBook SPA
+├── app/                        Total Recall layer-by-layer AppBook (FastAPI + vanilla JS)
 ├── images/                         Architecture diagrams + screenshots
 ├── enterprise_data_agent.ipynb     Original source notebook (181 cells; mirrored by notebook_complete_with_setup_code.ipynb)
 ├── requirements.txt                Workshop notebook deps
@@ -267,7 +257,7 @@ agent-harness-workshop-lightweight/
 - **In-database ONNX embedder** (`all-MiniLM-L12-v2`, 384-dim) loaded via `DBMS_VECTOR.LOAD_ONNX_MODEL`. No hosted embedding API.
 - **In-database ONNX cross-encoder reranker** (`bge-reranker-base`) called via `PREDICTION()`.
 - **`openai` SDK** — pointed at OpenAI directly or OCI GenAI\'s OpenAI-compatible endpoint via `LLM_PROVIDER`.
-- **App**: Flask + Socket.IO + eventlet (backend); React 18 + Vite + Tailwind + react-globe.gl (frontend).
+- **App**: FastAPI backend plus a dependency-free JavaScript SPA.
 
 ## What is "an agent" in this workshop?
 

@@ -16,6 +16,6 @@ fi
 python -c "import fastapi, sse_starlette" 2>/dev/null || pip install -q "fastapi>=0.110" "uvicorn>=0.27" "sse-starlette>=2.0"
 
 HOST="${HOST:-127.0.0.1}"
-PORT="${PORT:-8001}"
+PORT="${PORT:-8000}"
 echo "→ Total Recall appbook on http://${HOST}:${PORT}"
 exec uvicorn backend.main:app --host "${HOST}" --port "${PORT}" "$@"

@@ -1,131 +1,55 @@
-"""Environment-driven configuration. Mirrors the notebook's §2.4 credentials cell
-and §3.x DSN setup, but reads from .env / process env instead of getpass prompts."""
+"""Central configuration for the Total Recall appbook.
+
+Reads the same environment the notebook uses (Oracle creds, Anthropic key, model
+names) so the app runs against the very harness the notebook builds. A single
+``settings`` object is imported across the backend.
+"""
+from __future__ import annotations
 
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+APP_DIR = Path(__file__).resolve().parent.parent          # .../appbook
+BACKEND_DIR = APP_DIR / "backend"
+FRONTEND_DIR = APP_DIR / "frontend"
+
+# Load .env in priority order (app-local wins, then the project root).
+for candidate in (APP_DIR.parent / ".env", APP_DIR / ".env"):
+    if candidate.exists():
+        load_dotenv(candidate, override=True)
 
 
-# Flask
-FLASK_PORT = int(os.environ.get("FLASK_PORT", "8000"))
-FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
-FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-me")
+class Settings:
+    # Oracle AI Database (the harness the notebook built).
+    ora_user: str = os.environ.get("ORA_AGENT_USER", "AGENT")
+    ora_password: str = os.environ.get("ORA_AGENT_PWD", "AgentPw_2026")
+    ora_dsn: str = os.environ.get("ORA_DSN", "localhost:1521/FREEPDB1")
+    oracle_enabled: bool = os.environ.get("ORACLE_ENABLED", "1") not in {"0", "false", "False"}
 
-# Oracle DB
-SYS_USER = os.environ.get("ORACLE_SYS_USER", "sys")
-SYS_PASS = os.environ.get("ORACLE_SYS_PASS", "OraclePwd_2025")
-SYS_DSN = os.environ.get("ORACLE_DSN", "localhost:1521/FREEPDB1")
+    # Models (loaded into the database by the notebook).
+    embed_model: str = os.environ.get("EMBED_MODEL", "ALL_MINILM_L12_V2")
+    rerank_model: str = os.environ.get("RERANK_MODEL", "RERANK_XENC")
+    vector_dim: int = int(os.environ.get("VECTOR_DIM", "384"))
 
-AGENT_USER = os.environ.get("ORACLE_AGENT_USER", "AGENT")
-AGENT_PASS = os.environ.get("ORACLE_AGENT_PASS", "AgentPwd_2025")
+    # Cognitive memory (OAMP).
+    oamp_prefix: str = os.environ.get("OAMP_PREFIX", "OAMP_")
 
-DEMO_USER = os.environ.get("ORACLE_DEMO_USER", "SUPPLYCHAIN")
-DEMO_PASS = os.environ.get("ORACLE_DEMO_PASS", "SupplyPwd_2025")
+    # Chat model — OCI Generative AI via its OpenAI-compatible endpoint (Oracle powers the model too).
+    # The only outbound network call. Set LLM_PROVIDER=openai to use OpenAI directly instead.
+    llm_provider: str = os.environ.get("LLM_PROVIDER", "oci")
+    oci_endpoint: str = os.environ.get(
+        "OCI_GENAI_ENDPOINT", "https://inference.generativeai.us-phoenix-1.oci.oraclecloud.com"
+    )
+    # OCI_GENAI_API_KEY when LLM_PROVIDER=oci; OPENAI_API_KEY when LLM_PROVIDER=openai.
+    llm_api_key: str | None = os.environ.get("OCI_GENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    model: str = os.environ.get("LLM_MODEL", "xai.grok-4-1-fast-reasoning")
+    max_tokens: int = int(os.environ.get("TR_MAX_TOKENS", "1536"))
 
-# In-DB ONNX embedder model name (registered in notebook §3.4)
-ONNX_EMBED_MODEL = os.environ.get("ONNX_EMBED_MODEL", "ALL_MINILM_L12_V2")
-ONNX_EMBED_DIM = int(os.environ.get("ONNX_EMBED_DIM", "384"))
-
-# LLM
-# Defaults: OCI / xai.grok-4.3 (the workshop's primary). If OPENAI_API_KEY is
-# also set, the LlmRouter in agent/llm.py will keep `gpt-5.5` (or whatever
-# LLM_FALLBACK_MODEL is) as a transparent fallback — it kicks in only if the
-# OCI primary errors out (auth, 404, network).
-LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "oci").strip().lower()  # "openai" | "oci"
-LLM_MODEL = os.environ.get("LLM_MODEL", "xai.grok-4.3").strip()
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
-OCI_COMPARTMENT_ID = os.environ.get("OCI_COMPARTMENT_ID", "").strip()
-
-
-# ----- OCI credential normalization ----------------------------------------
-# The notebook (§3.3) hard-codes
-#     https://inference.generativeai.<region>.oci.oraclecloud.com/openai/v1
-# and prompts for a single API key. In production .env files we've seen two
-# kinds of damage that quietly break OCI:
-#   1. Endpoint missing the OpenAI-compatible suffix (`/openai/v1`).
-#      The OpenAI SDK appends `/chat/completions` to whatever you give it, so
-#      a bare host hits the wrong URL and 404s before auth even runs.
-#   2. API key field with multiple keys joined by " and " or "," — the dotenv
-#      parser treats the whole string as one secret, and OCI rejects it as
-#      malformed.
-# Normalize both at import time so downstream code sees clean values.
-
-def _normalize_oci_endpoint(url: str) -> str:
-    url = (url or "").strip().rstrip("/")
-    if not url:
-        return url
-    # Already pointing at one of OCI GenAI's accepted OpenAI-compatible paths.
-    if url.endswith("/openai/v1") or url.endswith("/20231130/openai"):
-        return url
-    if url.endswith("/openai"):
-        return url + "/v1"
-    if url.endswith("/20231130"):
-        return url + "/openai"
-    # Anything else (bare host, custom path, …) — append the canonical
-    # /openai/v1 suffix the notebook uses.
-    return url + "/openai/v1"
+    # Identity used for OAMP memory in the app.
+    user_id: str = os.environ.get("TR_USER_ID", "appbook_user")
+    agent_id: str = os.environ.get("TR_AGENT_ID", "total_recall")
 
 
-def _normalize_api_key(raw: str) -> str:
-    """Pick the first non-empty key out of a value that may contain multiple
-    keys joined by ' and ' / ',' / ';' / whitespace."""
-    if not raw:
-        return ""
-    s = raw.strip()
-    # Split on ' and ' first (most likely human-pasted separator), then
-    # fall back to comma / semicolon / whitespace.
-    for sep in [" and ", ",", ";"]:
-        if sep in s:
-            s = s.split(sep, 1)[0].strip()
-            break
-    return s.split()[0] if s else ""
-
-
-OCI_GENAI_API_KEY_RAW = os.environ.get("OCI_GENAI_API_KEY", "")
-OCI_GENAI_API_KEY = _normalize_api_key(OCI_GENAI_API_KEY_RAW)
-
-OCI_GENAI_ENDPOINT_RAW = os.environ.get(
-    "OCI_GENAI_ENDPOINT",
-    "https://inference.generativeai.us-phoenix-1.oci.oraclecloud.com/openai/v1",
-)
-OCI_GENAI_ENDPOINT = _normalize_oci_endpoint(OCI_GENAI_ENDPOINT_RAW)
-
-# Capture whether the .env had to be cleaned, so build_llm_client can warn.
-OCI_API_KEY_WAS_CLEANED = bool(OCI_GENAI_API_KEY_RAW) and (OCI_GENAI_API_KEY != OCI_GENAI_API_KEY_RAW.strip())
-OCI_ENDPOINT_WAS_CLEANED = bool(OCI_GENAI_ENDPOINT_RAW) and (OCI_GENAI_ENDPOINT != OCI_GENAI_ENDPOINT_RAW.strip().rstrip("/"))
-
-
-# Fallback model used when OCI is missing or rejects auth at runtime. The
-# user explicitly asked for gpt-5.5 here (env-overridable).
-LLM_FALLBACK_MODEL = os.environ.get("LLM_FALLBACK_MODEL", "gpt-5.5").strip()
-
-# Tavily — gives the agent real-time web/news access. When the key is unset
-# the search_tavily tool returns a friendly error instead of crashing.
-TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "").strip()
-
-# Agent loop
-AGENT_MAX_ITERATIONS = int(os.environ.get("AGENT_MAX_ITERATIONS", "8"))
-AGENT_BUDGET_SECONDS = float(os.environ.get("AGENT_BUDGET_SECONDS", "60"))
-
-# Maximum context window for the configured LLM (override via env). Used by
-# the front-end's token meter to render a "X / max" bar. Reasonable defaults
-# below cover common GPT / Claude / Grok lines.
-def _default_model_max(model: str) -> int:
-    m = (model or "").lower()
-    if m.startswith("gpt-5") or m.startswith("gpt-4.1") or m.startswith("o1") or m.startswith("o3"):
-        return 200_000
-    if m.startswith("gpt-4o"):
-        return 128_000
-    if "claude" in m:
-        return 200_000
-    if "grok" in m:
-        return 131_072
-    return 128_000
-
-
-LLM_MODEL_MAX_TOKENS = int(os.environ.get("LLM_MODEL_MAX_TOKENS", str(_default_model_max(LLM_MODEL))))
-
-# OAMP scoping (every memory carries these)
-USER_ID = os.environ.get("EDA_USER_ID", "enterprise-operator")
-AGENT_ID = os.environ.get("EDA_AGENT_ID", "enterprise-data-agent")
+settings = Settings()

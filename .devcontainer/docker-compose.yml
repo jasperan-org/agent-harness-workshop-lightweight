@@ -1,27 +1,70 @@
+# Dev container = the `app` service + a local Oracle AI Database (23ai/26ai Free).
+#   • oracle — the single converged engine the whole harness runs on: the warehouse,
+#     in-database ONNX embeddings, HNSW + Oracle Text retrieval, OAMP cognitive memory,
+#     the tool / skill registries, and DBMS_SCHEDULER automations.
+#   • app    — the Python container that runs both the notebook (JupyterLab) and the appbook
+#     (FastAPI + dependency-free SPA). It reaches the database by its service name, `oracle`.
+# The database persists across restarts via a named volume.
 services:
   oracle:
-    # NOTE: NOT the `-slim` variant. The workshop requires Oracle Spatial
-    # (SDO_GEOMETRY for vessel_positions / ports) AND Oracle Text
-    # (CTXSYS.CONTEXT index for the Part 3 hybrid retrieval). The slim image
-    # strips both. Use the regular `23` tag (~10 GB, full feature set).
-    #
-    # `faststart` variant: same content as `23`, but the database is
-    # pre-initialized inside the image, so first container start is ~10 s
-    # instead of the 5-minute initdb dance. Worth the bigger pull on a Codespace.
-    image: gvenzl/oracle-free:23-faststart
-    container_name: oracle-free
+    image: gvenzl/oracle-free:latest
+    restart: unless-stopped
+    shm_size: "1g"
     environment:
-      ORACLE_PASSWORD: OraclePwd_2025
-    ports:
-      - "1521:1521"
-    healthcheck:
-      test: ["CMD", "healthcheck.sh"]
-      interval: 20s
-      timeout: 10s
-      retries: 30
-      start_period: 180s
+      ORACLE_PASSWORD: OraclePwd_2025 # the SYS / SYSTEM password (used as ORA_ADMIN_PWD below)
     volumes:
-      - oracle-data:/opt/oracle/oradata
+      - oracle-data:/opt/oracle/oradata # persist the database across restarts
+      # Allocate the Vector Memory Pool (256M) so HNSW can build. The Free image defaults it to 0,
+      # and going 0 -> non-zero needs a restart, so this hook sets it + bounces the instance ONCE
+      # (conditional/idempotent — a no-op once the pool is allocated). Must stay executable.
+      - ./oracle-init/vector-memory.sh:/container-entrypoint-startdb.d/01-vector-memory.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 90s
+
+  app:
+    image: mcr.microsoft.com/devcontainers/python:3.12
+    command: sleep infinity
+    volumes:
+      - ../..:/workspaces:cached
+    environment:
+      HOST: "0.0.0.0" # bind on all interfaces so Codespaces can forward the port
+      PORT: "8000"
+      # The agent's brain is OCI Generative AI (OpenAI-compatible endpoint) — so Oracle powers the
+      # model too, not just embeddings/retrieval/memory. Codespaces exposes repo/org/user secrets to
+      # the VM that runs compose; this forwards the secret INTO the app container (a compose service
+      # only sees secrets you explicitly pass through). Set OCI_GENAI_API_KEY as a Codespaces secret
+      # (org-level recommended).
+      LLM_PROVIDER: oci # "oci" | "openai"
+      # Up to 4 OCI keys for load spreading across a large cohort. The notebook + app pick a random
+      # starting key per process and fail over to the next on a 429 / rate-limit error. Only
+      # OCI_GENAI_API_KEY is required; _2/_3/_4 are optional. Set them as Codespaces secrets.
+      OCI_GENAI_API_KEY: ${OCI_GENAI_API_KEY:-}
+      OCI_GENAI_API_KEY_2: ${OCI_GENAI_API_KEY_2:-}
+      OCI_GENAI_API_KEY_3: ${OCI_GENAI_API_KEY_3:-}
+      OCI_GENAI_API_KEY_4: ${OCI_GENAI_API_KEY_4:-}
+      OCI_GENAI_ENDPOINT: https://inference.generativeai.us-phoenix-1.oci.oraclecloud.com
+      LLM_MODEL: xai.grok-4-1-fast-reasoning # OCI GenAI model id (e.g. xai.grok-4-1-fast-reasoning, gpt-5.5-mini)
+      # ── Oracle AI Database (shared by the notebook and the appbook) ──
+      ORA_DSN: oracle:1521/FREEPDB1 # reach the DB by its compose service name
+      ORA_ADMIN_USER: SYS
+      ORA_ADMIN_PWD: OraclePwd_2025
+      ORA_AGENT_USER: AGENT
+      ORA_AGENT_PWD: AgentPw_2026
+      ORACLE_ENABLED: "1"
+      EMBED_MODEL: ALL_MINILM_L12_V2 # in-DB ONNX embedder (384-dim), loaded by the seed
+      RERANK_MODEL: RERANK_XENC # optional in-DB cross-encoder reranker
+      VECTOR_DIM: "384"
+      # The notebook and the appbook share ONE AGENT schema. Keep data across notebook runs so a
+      # re-run never wipes the live app's tables (the notebook is idempotent — it never needs a reset
+      # here). Set RESET_ON_RUN=1 only if you run the notebook against a private database.
+      RESET_ON_RUN: "0"
+    depends_on:
+      oracle:
+        condition: service_healthy
 
 volumes:
   oracle-data:

@@ -5,7 +5,7 @@ idempotently) in the background on startup, mounts one router group per layer,
 and serves the dependency-free SPA from the same origin.
 
 Run from the appbook/ directory:
-    uvicorn backend.main:app --reload --port 8001
+    uvicorn backend.main:app --reload --port 8000
 """
 from __future__ import annotations
 
@@ -47,4 +47,4 @@ app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="fronte
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.main:app", host="127.0.0.1", port=8001, reload=False)
+    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=False)
