@@ -8,7 +8,7 @@ import re
 
 import requests
 
-from backend.core import db, memory, scratch
+from backend.core import context, db, memory, scratch
 
 EMB = db.EMB
 TOOLS: dict = {}   # name -> callable (callables can't live in the DB)
@@ -323,15 +323,41 @@ def register_default_tools():
                   "Save a durable fact to long-term memory.", {"fact": "string"}, category="memory")
     register_tool("promote_file_to_memory", lambda path: promote_file_to_memory(path),
                   "Promote a scratch file into durable long-term memory.", {"path": "string"}, category="memory")
+    register_tool("recall_context", lambda query: context.recall_tool(query),
+                  "Search context that was compacted or offloaded out of the window (archived turn "
+                  "summaries and large tool results) by meaning.",
+                  {"query": "string"}, category="context",
+                  synonyms=["offload", "archive", "archived context", "forgotten detail"],
+                  when_to_use="when a detail from earlier in the session or a large tool result is missing")
+
+
+def _ensure_skill(name, description, tools, body):
+    """Seed one starter skill if it is missing (per-name, so a new starter reaches existing installs)."""
+    if db.q("SELECT 1 FROM agent_skills WHERE name=:n", {"n": name}):
+        return False
+    save_skill(name, description, _skill_md(name, description, tools, body), tools)
+    return True
 
 
 def seed_starter_skills():
-    if db.q("SELECT COUNT(*) n FROM agent_skills")[0]["N"] > 0:
-        return
-    save_skill("revenue_by_category",
-               "Compute net revenue grouped by product category over a recent window",
-               _skill_md("revenue_by_category", "Compute net revenue by product category",
-                         ["list_sources", "run_sql", "create_automation"],
-                         "1. list_sources\n2. SELECT category, SUM(net_revenue) FROM v_revenue ... GROUP BY category\n"
-                         "3. optionally create_automation to refresh it on a cadence"),
-               ["list_sources", "run_sql", "create_automation"])
+    _ensure_skill(
+        "revenue_by_category",
+        "Compute net revenue grouped by product category over a recent window",
+        ["list_sources", "run_sql", "create_automation"],
+        "1. list_sources\n2. SELECT category, SUM(net_revenue) FROM v_revenue ... GROUP BY category\n"
+        "3. optionally create_automation to refresh it on a cadence")
+    # The Layer 8 demo retrieves this skill by meaning ("research supplier risk on the web") and
+    # loads its full body into the window, which is the point: a skill is a document retrieved,
+    # not a hard-wired tool. The workshop harness ships no outbound search tool, so the playbook
+    # says to say so rather than invent sources.
+    _ensure_skill(
+        "web_research",
+        "Research an external topic on the web: run searches, extract sourced claims, write a brief",
+        ["find_skill", "remember_fact", "promote_file_to_memory"],
+        "1. Restate the research question and the decision it informs.\n"
+        "2. Check the tool registry for a search or fetch tool (find_skill). If none is wired in "
+        "this harness, say so plainly - never invent sources.\n"
+        "3. With a search tool: run two or three differently-worded queries and fetch the top pages.\n"
+        "4. Extract each claim with its publication date and URL; keep only claims seen twice.\n"
+        "5. Write the brief to /research/<topic>.md in scratch: sourced claims, open questions.\n"
+        "6. Promote the durable conclusions to long-term memory; leave the page dumps in scratch.")

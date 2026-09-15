@@ -70,10 +70,10 @@ const LAYERS = [
     watch: "Ask an analytical question. Watch the live trace: context assembled → tools selected → SQL run → answer. Ask it to make a result a daily automation and watch it build one." },
   { id: "context", n: 8, nav: "Context Engineering", icon: I.gauge, accent: "#a0e060", diagram: "/images/context_card_what_an_agent_needs.png",
     title: "Context Engineering", kicker: "Layer 8 — Keeping the window flat",
-    desc: "Sessions grow; a naive loop re-sends the whole transcript and every full tool result until quality falls off a cliff. Two moves keep the window flat: compaction (the context card) and offloading (large results leave the window, leaving a reference).",
+    desc: "A session grows; a naive loop re-sends the whole transcript and every full tool result until quality falls off a cliff. Three moves keep the window flat and dense: retrieval (only relevant skills and tools enter), compaction (older turns become an archived recap) and offloading (a big tool result leaves the window as a reference to a vector row).",
     term: "<b>Context rot.</b> Model quality degrades non-linearly well before the hard token limit. What matters is keeping the relevant context dense — not how much fits. Compact at ~60–70%, offload the rest.",
-    adv: "The difference between an agent that's sharp for three turns and one that stays sharp for three hours — and it's the same harness, just managed.",
-    watch: "The money shot: a long session charted twice — context engineering OFF (climbs without bound) vs ON (flat). Same loop, managed context." },
+    adv: "The difference between an agent that's sharp for three turns and one that stays sharp for three hours — the same harness, just managed. Everything offloaded stays in Oracle, embedded and recallable by meaning.",
+    watch: "Ask a question and watch the live window: what entered and its token cost, the skill retrieved and loaded at runtime, then every offload and compaction as the window breathes. Search the archive to pull an offloaded detail back by meaning." },
   { id: "mission", n: 9, nav: "Mission Control", icon: I.bot, accent: "#8b9cff", diagram: "/images/agent_harness.png",
     title: "Mission Control — The Full Agent", kicker: "Layer 9 — Everything, working together",
     desc: "The whole harness in one console: a full chat agent grounded in memory, retrieval, the semantic layer and skills; the live context window it assembles on every turn; and the automations it can build, run, pause and resume — by button, or just by asking it.",
@@ -165,7 +165,7 @@ async function streamSSE(url, body, onEvent, signal) {
   }
 }
 
-const state = { health: null, abort: null, route: "", chat: uid(), agent: uid(), mission: "mc-" + uid() };
+const state = { health: null, abort: null, route: "", chat: uid(), agent: uid(), mission: "mc-" + uid(), context: "ctx-" + uid() };
 function cancelStream() { if (state.abort) { try { state.abort.abort(); } catch (_) {} state.abort = null; } }
 
 // ── sidebar + status ───────────────────────────────────────────────────
@@ -497,6 +497,10 @@ function viewAgent() {
     try {
       await streamSSE("/api/agent/run", { prompt: p, thread_id: state.agent }, (e) => {
         if (e.type === "context") { ev("ctx", `<b>assemble_context</b> · ${e.tools.length} tools · ${e.catalog.length} catalog hits`); if (e.card) ev("ctx dim", "context card: " + esc((e.card || "").replace(/\s+/g, " ").slice(0, 90)) + "…"); }
+        else if (e.type === "retrieval") ev("ctx dim", `retrieval: ${(e.skills || []).filter((s) => s.selected).length}/${(e.skills || []).length} skills · ${(e.tools || []).filter((t) => t.selected).length}/${(e.tools || []).length} tools enter the window`);
+        else if (e.type === "skill_loaded") ev("ctx", `⬇ loaded skill <b>${esc(e.name)}</b> (+${(e.tokens || 0).toLocaleString()} tokens)`);
+        else if (e.type === "offload") ev("ctx dim", `⇩ offloaded ${esc(e.tool)} result (${(e.chars || 0).toLocaleString()} chars) → archive ${esc(e.ref)}`);
+        else if (e.type === "compaction") ev("ctx", `⌁ compaction (${esc(e.scope)}) · ${(e.saved || 0).toLocaleString()} tokens saved`);
         else if (e.type === "error") { ans.innerHTML = `<span class="bad">${esc(e.message)}</span>`; ev("err", esc(e.message)); }
         else if (e.type === "tool_call") ev("call", `→ <b>${esc(e.name)}</b>(${esc(JSON.stringify(e.args).slice(0, 80))})`);
         else if (e.type === "tool_result") ev("res", `← ${esc(e.name)}: <span class="dim">${esc((e.preview || "").slice(0, 110))}</span>`);
@@ -508,19 +512,233 @@ function viewAgent() {
 }
 
 // ── L8 CONTEXT ──────────────────────────────────────────────────────────
+const CTX_SAMPLES = ["Show total revenue by product category for the last 90 days.",
+  "Which skill covers researching supplier risk on the web? Load it and summarise the playbook.",
+  "List every order item from the last 180 days with product and customer detail."];
+const CX_COLORS = { instructions: "#6aa9ff", catalog: "#5fd0d0", skills: "#ffd166", recipes: "#c79cff", card: "#ff9e64", recap: "#a0e060", history: "#f78fb3" };
 function viewContext() {
   const l = BY_ID.context;
   setStage(`${header(l)}
-    ${panel("Context size over a long session", `
-      <p class="small">Same loop, run twice. <b style="color:#f7768e">OFF</b>: resend the full transcript + every full tool result. <b style="color:#9ece6a">ON</b>: inject the bounded context card + offload large results to a reference.</p>
-      <button class="btn btn-accent" id="cx-go">Simulate 16 turns</button>
-      <div id="cx-chart" style="margin-top:16px">${empty("press simulate")}</div>`, I.gauge)}`, l.accent);
-  $("#cx-go").addEventListener("click", async () => {
-    $("#cx-chart").innerHTML = spin + " simulating…";
+    <div class="grid-2">
+      ${panel("Ask the agent — watch the window", `
+        <div id="cx-log" class="chatlog cx-log"><div class="empty">Ask a question. Retrieval, dynamic skill loads, offloads and compaction all stream into the panels beside this one.</div></div>
+        <div class="field" style="margin-top:10px"><textarea id="cx-in" rows="1" placeholder="Ask an analytical question…">${esc(CTX_SAMPLES[0])}</textarea><button class="btn btn-accent" id="cx-go">${I.send}</button></div>
+        <div class="chips" style="margin-top:8px">${CTX_SAMPLES.map((s) => `<button class="chip">${esc(s)}</button>`).join("")}</div>
+        <div class="row" style="margin-top:8px"><button class="btn btn-ghost" id="cx-preview">Preview assembly (no model call)</button><button class="btn btn-ghost" id="cx-compact">Compact older turns now</button><button class="btn btn-ghost" id="cx-new">New session</button></div>`, I.chat)}
+      ${panel("Live context window", `
+        <div class="cx-readout"><b id="cx-tok">0</b><span class="dim small" id="cx-budget">/ — tokens</span><span class="hint" id="cx-model"></span></div>
+        <div class="cx-track"><div class="cx-used" id="cx-used"></div></div>
+        <div class="cx-legend" id="cx-legend"></div>
+        <div class="cx-title">System prompt · <span id="cx-sys">0</span> tokens</div>
+        <div class="cx-rows" id="cx-sections">${empty("nothing assembled yet")}</div>
+        <div class="cx-title">Messages assembled · <span id="cx-msgs">0</span> · <span id="cx-msg-tok">0</span> tokens</div>
+        <div class="cx-rows" id="cx-messages">${empty("nothing assembled yet")}</div>
+        <div class="cx-title">Window size over this session</div>
+        <div id="cx-chart-holder">${empty("run or preview to plot the window")}</div>
+        <details class="cx-det" style="margin-top:12px"><summary class="hint">Baseline: naive vs. managed context (simulated)</summary>
+          <div id="cx-sim-chart" style="margin-top:10px">${empty("press simulate")}</div>
+          <button class="btn btn-ghost btn-sm" id="cx-sim" style="margin-top:8px">Simulate 16 turns</button>
+        </details>`, I.gauge)}
+    </div>
+    <div class="grid-2" style="margin-top:16px">
+      ${panel("Skill retrieval → dynamic load", `<div id="cx-skills">${empty("retrieval appears here")}</div>`, I.tool)}
+      ${panel("Compaction, offload & the vector archive", `
+        <div id="cx-events" class="cx-lines">${empty("compaction and offload events appear here")}</div>
+        <div class="field" style="margin-top:12px"><input id="cx-q" placeholder="Recall archived context by meaning…" value="supplier risk" /><button class="btn" id="cx-recall">Recall</button></div>
+        <div class="cx-title">agent_context_archive · this session</div>
+        <div id="cx-arch" class="cx-archlist">${empty("nothing archived yet")}</div>`, I.db)}
+    </div>`, l.accent);
+
+  const S = { thread: state.context, tokens: 0, peak: 0, budget: 0, model: "", sections: [], messages: [],
+    skills: [], tools: [], pts: [], loads: {} };
+  const log = $("#cx-log"), fmt = (n) => (n || 0).toLocaleString(), hue = (n) => CX_COLORS[n] || "#8892b0";
+  function addMsg(role, html) { if (log.querySelector(".empty")) log.innerHTML = ""; const d = document.createElement("div"); d.className = "msg " + role; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; }
+
+  function renderWindow() {
+    $("#cx-tok").textContent = fmt(S.tokens);
+    $("#cx-budget").textContent = S.budget ? `/ ${fmt(S.budget)} token budget` : "/ — tokens";
+    $("#cx-model").textContent = (state.health && state.health.model) || S.model || "";
+    $("#cx-used").style.width = (S.budget ? Math.min(100, (100 * S.tokens) / S.budget) : 0) + "%";
+    const shown = S.sections.filter((s) => s.tokens > 0);
+    $("#cx-used").innerHTML = shown.map((s) => `<i style="width:${S.tokens ? (100 * s.tokens) / S.tokens : 0}%;background:${hue(s.name)}" title="${esc(s.label)} · ${fmt(s.tokens)} tokens"></i>`).join("");
+    $("#cx-legend").innerHTML = shown.map((s) => `<span><i style="background:${hue(s.name)}"></i>${esc(s.label)} <b>${fmt(s.tokens)}</b></span>`).join("") || '<span class="dim">assembled sections appear here</span>';
+    $("#cx-sys").textContent = fmt(shown.filter((s) => s.name !== "history").reduce((a, s) => a + s.tokens, 0));
+    $("#cx-sections").innerHTML = shown.length ? shown.map((s) => `<details class="cx-det"><summary class="cx-row"><span class="cx-k"><b>${esc(s.label)}</b>${s.note ? ` <span class="dim">· ${esc(s.note)}</span>` : ""}</span>${s.chars != null ? `<span class="cx-c">${fmt(s.chars)} ch</span>` : ""}<span class="cx-t">${fmt(s.tokens)}</span></summary><pre class="ctx-pre">${esc(s.preview || "(empty)")}${(s.chars || 0) > 170 ? " …" : ""}</pre></details>`).join("") : empty("nothing assembled yet");
+    const msgs = S.messages || [];
+    $("#cx-msgs").textContent = msgs.length;
+    $("#cx-msg-tok").textContent = fmt(msgs.reduce((a, m) => a + (m.tokens || 0), 0));
+    $("#cx-messages").innerHTML = msgs.length ? msgs.map((m) => `<div class="cx-row"><span class="cx-k"><b>${esc(m.role)}</b> <span class="dim">${esc((m.preview || "").slice(0, 80))}…</span></span><span class="cx-c">${fmt(m.chars)} ch</span><span class="cx-t">${fmt(m.tokens)}</span></div>`).join("") : empty("nothing assembled yet");
+  }
+
+  function renderChart() {
+    const host = $("#cx-chart-holder");
+    if (!S.pts.length) { host.innerHTML = empty("run or preview to plot the window"); return; }
+    const W = 620, H = 150, max = Math.max(S.budget || 0, S.peak || 1, 1), n = S.pts.length;
+    const X = (i) => (n === 1 ? W / 2 : (i / (n - 1)) * W), Y = (v) => H - 8 - (v / max) * (H - 22);
+    const line = S.pts.map((p, i) => `${X(i).toFixed(1)},${Y(p.tokens).toFixed(1)}`).join(" ");
+    const dots = S.pts.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.tokens).toFixed(1)}" r="2.6" fill="#a0e060"/>`).join("");
+    const marks = S.pts.map((p, i) => p.kind === "compact" ? `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.tokens).toFixed(1)}" r="5" fill="#a0e060" stroke="#0d1117" stroke-width="1"/>` : "").join("");
+    const budget = S.budget ? `<line x1="0" y1="${Y(S.budget).toFixed(1)}" x2="${W}" y2="${Y(S.budget).toFixed(1)}" stroke="#e0606a" stroke-width="1.5" stroke-dasharray="6 5"/>` : "";
+    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="chart cx-chart" preserveAspectRatio="none">${budget}
+        <polyline points="${line}" fill="none" stroke="#a0e060" stroke-width="2.5"/><g>${dots}${marks}</g></svg>
+      <div class="row spread" style="margin-top:6px"><span class="hint">peak ${fmt(S.peak)} tokens</span><span class="hint">budget ${fmt(S.budget)}</span><span class="hint">markers = compaction</span></div>`;
+  }
+
+  function cxEvent(cls, title, detail) {
+    const host = $("#cx-events");
+    if (host.querySelector(".empty")) host.innerHTML = "";
+    const d = document.createElement("div"); d.className = "cx-line " + cls;
+    d.innerHTML = `<b>${title}</b>` + (detail ? `<span class="cx-d">${detail}</span>` : "");
+    host.prepend(d);
+    while (host.children.length > 40) host.removeChild(host.lastChild);
+  }
+
+  function renderSkills() {
+    const host = $("#cx-skills");
+    if (!S.skills.length) { host.innerHTML = empty("retrieval appears here"); return; }
+    host.innerHTML = `<div class="cx-title" style="margin-top:0">Skill candidates · agent_skills by embedding distance <span class="dim">(lower d = closer)</span></div>`
+      + S.skills.map((c) => {
+        const sim = Math.max(0, Math.min(1, 1 - (c.dist == null ? 1 : c.dist))), loaded = S.loads[c.name];
+        return `<div class="cx-cand${c.selected ? " win" : ""}${loaded ? " loaded" : ""}">
+          <div class="cx-cand-top"><b>${esc(c.name)}</b>
+            <span class="tag ${c.selected ? "ok" : "no"}">${c.selected ? "in manifest" : "candidate"}</span>
+            ${loaded ? `<span class="tag ok">loaded · +${fmt(loaded.tokens)} tok</span>` : ""}
+            <span class="rscore">d ${c.dist == null ? "—" : (+c.dist).toFixed(3)}</span></div>
+          <div class="cx-bar"><i style="width:${Math.round(sim * 100)}%"></i></div>
+          <div class="small dim">${esc(c.description || "")}</div>
+          ${loaded && loaded.body_preview ? `<pre class="ctx-pre">${esc(loaded.body_preview)}…</pre>` : ""}
+        </div>`;
+      }).join("")
+      + `<div class="cx-title">Tools · top-k by meaning + essentials always on</div>
+         <div class="chips">${S.tools.map((t) => `<span class="chip chip-static${t.selected ? " on" : ""}" title="distance ${t.dist == null ? "—" : (+t.dist).toFixed(3)}">${esc(t.name)}</span>`).join("")}</div>`;
+  }
+
+  async function loadArchive(q) {
+    let d;
+    try { d = await getJSON(`/api/context/archive?thread_id=${encodeURIComponent(S.thread)}&k=6` + (q ? `&q=${encodeURIComponent(q)}` : "")); }
+    catch (_) { return; }
+    const host = $("#cx-arch");
+    if (!host) return;                     // the user already navigated away
+    const rows = (d && d.rows) || [];
+    host.innerHTML = rows.length ? rows.map((r) => `<details class="cx-det"><summary class="cx-row">
+        <span class="cx-k"><b>${esc(r.LABEL || r.KIND)}</b> <span class="dim">· ${esc(r.KIND)} · ${fmt(r.BODY_CHARS)} chars archived · ${esc(r.AT || "")}</span></span>
+        ${r.DIST != null ? `<span class="cx-c">d ${(+r.DIST).toFixed(3)}</span>` : ""}
+        <span class="cx-t">${esc(r.REF)}</span></summary>
+        <pre class="ctx-pre">${esc(r.SUMMARY || "")}
+
+${esc((r.HEAD || "").slice(0, 200))}…</pre></details>`).join("")
+      : empty("nothing archived yet — offload a large tool result, or compact a longer conversation");
+  }
+
+  function consume(e) {
+    if (!document.getElementById("cx-events")) return;   // the user already navigated away
+    if (e.type === "retrieval") {
+      S.skills = e.skills || []; S.tools = e.tools || [];
+      renderSkills();
+      cxEvent("size", `⇢ retrieval for “${esc((e.query || "").slice(0, 70))}”`,
+        `${S.skills.filter((s) => s.selected).length}/${S.skills.length} skills and ${S.tools.filter((t) => t.selected).length}/${S.tools.length} tools entered the window · ${e.history_msgs || 0} recent turn(s) travel as messages`);
+    } else if (e.type === "context") {
+      S.budget = e.budget || S.budget; S.model = e.model || S.model;
+      S.sections = e.sections || []; S.messages = e.messages || [];
+      S.tokens = e.est_tokens || 0; S.peak = Math.max(S.peak, S.tokens);
+      S.pts.push({ tokens: S.tokens, kind: "size" });
+      renderWindow(); renderChart();
+      cxEvent("size", `✎ assembled ${fmt(S.tokens)} tokens`, `${(e.tools || []).length} tools · ${(e.catalog || []).length} catalog hits · recap ${e.recap ? "yes" : "none"} · budget ${fmt(e.budget)}`);
+    } else if (e.type === "context_size") {
+      const before = S.tokens;
+      S.tokens = e.tokens; S.peak = Math.max(S.peak, e.peak || e.tokens);
+      S.pts.push({ tokens: e.tokens, kind: "size" });
+      renderWindow(); renderChart();
+      if (e.phase !== "assembled") cxEvent("size", `↻ ${esc(e.phase)}`, `${before === e.tokens ? "no change" : (e.tokens > before ? "+" : "−") + fmt(Math.abs(e.tokens - before))} → ${fmt(e.tokens)} tokens · ${e.messages} messages`);
+    } else if (e.type === "skill_loaded") {
+      S.loads[e.name] = e; renderSkills();
+      cxEvent("load", `⬇ loaded skill ${esc(e.name)} into the window`,
+        `${fmt(e.chars)} chars of SKILL.md · +${fmt(e.tokens)} tokens · sha ${esc(e.sha || "—")}${e.source_url ? ` · ${esc(e.source_url)}` : ""}`);
+    } else if (e.type === "offload") {
+      cxEvent("offload", `⇩ offloaded ${esc(e.tool)} result`, `${fmt(e.chars)} chars left the window → agent_context_archive ${esc(e.ref)} · ${fmt(e.saved)} tokens saved`);
+      loadArchive();
+    } else if (e.type === "compaction") {
+      if (e.scope === "turns") {
+        const sec = S.sections.find((s) => s.name === "recap");
+        if (sec) { sec.tokens = e.after || 0; sec.chars = null; sec.preview = e.summary || sec.preview; }
+        S.pts.push({ tokens: e.after || 0, kind: "compact" });
+        cxEvent("compact", `⌁ compacted turns ${e.seq_from ?? 0}–${e.seq_to ?? 0} → recap`,
+          `${esc(e.method || "llm")} summary · ${fmt(e.before)} → ${fmt(e.after)} tokens (${fmt(e.saved)} saved)${e.summary ? ` · “${esc(String(e.summary).slice(0, 150))}…”` : ""}`);
+      } else {
+        S.pts.push({ tokens: e.after || 0, kind: "compact" });
+        cxEvent("compact", "⌁ trimmed mid-run tool results",
+          `${fmt(e.before)} → ${fmt(e.after)} tokens (${fmt(e.saved)} saved) · structure preserved so tool-call pairing stays valid`);
+      }
+      renderWindow(); renderChart(); loadArchive();
+    } else if (e.type === "done") {
+      const c = e.context || {};
+      cxEvent("size", `✓ done · peak ${fmt(c.peak_tokens || S.peak)} tokens`,
+        `${fmt(c.compactions)} compaction(s) · ${fmt(c.offloads)} offload(s) · skills loaded: ${(c.skills_loaded || []).join(", ") || "none"}`);
+      loadArchive();
+    } else if (e.type === "error") {
+      cxEvent("err", "! " + esc(e.message), "");
+    }
+  }
+
+  async function send() {
+    const p = $("#cx-in").value.trim(); if (!p || state.abort) return;
+    addMsg("user", esc(p)); $("#cx-in").value = "";
+    const out = addMsg("bot", '<span class="caret"></span>'); let acc = "", failed = false;
+    state.abort = new AbortController();
+    try {
+      await streamSSE("/api/agent/run", { prompt: p, thread_id: S.thread }, (e) => {
+        if (e.type === "delta") { acc += e.text; out.innerHTML = renderRich(acc) + '<span class="caret"></span>'; log.scrollTop = log.scrollHeight; }
+        else { if (e.type === "error") { failed = true; out.innerHTML = `<span class="bad">${esc(e.message)}</span>`; } consume(e); }
+      }, state.abort.signal);
+    } catch (e) { failed = true; out.innerHTML = `<span class="bad">Error: ${esc(e.message)}</span>`; } finally { state.abort = null; }
+    if (!acc && !failed) out.innerHTML = empty("(no answer)");
+  }
+
+  async function preview() {
+    const p = $("#cx-in").value.trim() || CTX_SAMPLES[0];
+    $("#cx-preview").innerHTML = spin + " assembling…";
+    try {
+      const d = await postJSON("/api/context/preview", { prompt: p, thread_id: S.thread });
+      consume(d.retrieval); consume(d.context);
+      cxEvent("size", "👁 previewed the assembly (no model call)",
+        `${fmt(d.tokens)} tokens · budget ${fmt(d.budget)}` + (d.compaction && d.compaction.would_archive ? ` · ${d.compaction.would_archive} older turn(s) would be archived on a real run` : ""));
+      loadArchive();
+    } catch (e) { cxEvent("err", "! preview failed", esc(e.message)); }
+    const btn = $("#cx-preview");
+    if (btn) btn.textContent = "Preview assembly (no model call)";
+  }
+
+  function newSession() {
+    cancelStream();
+    state.context = "ctx-" + uid(); S.thread = state.context;
+    log.innerHTML = '<div class="empty">New session. Durable memory persists; this conversation starts fresh.</div>';
+    S.tokens = S.peak = 0; S.sections = []; S.messages = []; S.skills = []; S.tools = []; S.pts = []; S.loads = {};
+    $("#cx-events").innerHTML = empty("compaction and offload events appear here");
+    renderWindow(); renderSkills(); renderChart();
+    preview(); loadArchive();
+  }
+
+  $("#cx-go").addEventListener("click", send);
+  $("#cx-in").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  $$("#stage .chip").forEach((c) => c.addEventListener("click", () => { $("#cx-in").value = c.textContent; send(); }));
+  $("#cx-preview").addEventListener("click", preview);
+  $("#cx-new").addEventListener("click", newSession);
+  $("#cx-recall").addEventListener("click", () => loadArchive($("#cx-q").value.trim()));
+  $("#cx-q").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); loadArchive($("#cx-q").value.trim()); } });
+  $("#cx-compact").addEventListener("click", async () => {
+    const d = await postJSON("/api/context/compact", { thread_id: S.thread });
+    if (d.info && d.info.archived_now) cxEvent("compact", `⌁ archived turns ${d.info.seq_from}–${d.info.seq_to} (${esc(d.info.method)})`,
+      `${fmt(d.info.before)} → ${fmt(d.info.after)} tokens · ${fmt(d.info.saved)} saved${d.info.summary ? ` · “${esc(String(d.info.summary).slice(0, 140))}…”` : ""}`);
+    else cxEvent("size", "nothing new to compact yet",
+      `${d.older} older turn message(s) · chunks of ${d.chunk} are archived at a time (keep-recent ${d.history_messages})`);
+    loadArchive();
+  });
+  $("#cx-sim").addEventListener("click", async () => {
+    $("#cx-sim-chart").innerHTML = spin + " simulating…";
     const d = await getJSON("/api/context/series");
     const off = d.off, on = d.on, max = Math.max(...off), W = 640, H = 220, n = off.length;
     const pts = (arr) => arr.map((v, i) => `${(i / (n - 1) * W).toFixed(1)},${(H - v / max * (H - 10)).toFixed(1)}`).join(" ");
-    $("#cx-chart").innerHTML = `
+    $("#cx-sim-chart").innerHTML = `
       <svg viewBox="0 0 ${W} ${H}" class="chart" preserveAspectRatio="none">
         <polyline points="${pts(off)}" fill="none" stroke="#f7768e" stroke-width="3"/>
         <polyline points="${pts(on)}" fill="none" stroke="#9ece6a" stroke-width="3"/>
@@ -528,6 +746,8 @@ function viewContext() {
       <div class="row spread" style="margin-top:8px"><span class="hint"><span class="leg" style="background:#f7768e"></span>OFF — ends at ${off[off.length - 1].toLocaleString()}</span><span class="hint"><span class="leg" style="background:#9ece6a"></span>ON — ends flat at ${on[on.length - 1].toLocaleString()}</span></div>
       <p class="small" style="margin-top:10px">Flat context is what keeps a long session both affordable and sharp.</p>`;
   });
+
+  renderWindow(); renderSkills(); renderChart(); preview(); loadArchive();
 }
 
 // ── L9 MISSION CONTROL ───────────────────────────────────────────────────
@@ -583,11 +803,13 @@ function viewMission() {
   const log = $("#mc-log");
   function add(role, html) { if (log.querySelector(".empty")) log.innerHTML = ""; const d = document.createElement("div"); d.className = "msg " + role; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; }
   function renderCtx(e) {
-    const cap = 4000, pct = Math.min(100, Math.round(100 * (e.est_tokens || 0) / cap));
-    $("#mc-tok").textContent = e.est_tokens ? "~" + e.est_tokens.toLocaleString() + " tokens" : "";
+    const cap = e.budget || 4000, pct = Math.min(100, Math.round(100 * (e.est_tokens || 0) / cap));
+    $("#mc-tok").textContent = e.est_tokens ? "~" + e.est_tokens.toLocaleString() + " / " + cap.toLocaleString() + " tokens" : "";
     const list = (arr, cls) => (arr && arr.length) ? arr.map((s) => `<div class="ctx-item ${cls || ""}">${esc(s)}</div>`).join("") : '<div class="dim small">none</div>';
+    const sizes = (e.sections || []).filter((s) => s.tokens > 0);
     $("#mc-ctx-body").innerHTML = `
-      <div class="ctx-gauge" title="estimated prompt size"><div class="ctx-gauge-fill" style="width:${pct}%"></div></div>
+      <div class="ctx-gauge" title="estimated prompt size against the Layer 8 budget"><div class="ctx-gauge-fill" style="width:${pct}%"></div></div>
+      <div class="ctx-sec"><div class="ctx-h">Assembled sections · tokens</div><div class="chips">${sizes.map((s) => `<span class="chip chip-static" title="${(s.chars || 0).toLocaleString()} chars">${esc(s.label)} · ${s.tokens.toLocaleString()}</span>`).join("") || '<span class="dim small">none</span>'}</div></div>
       <div class="ctx-sec"><div class="ctx-h">Tools selected · ${(e.tools || []).length}</div><div class="chips">${(e.tools || []).map((t) => `<span class="chip chip-static">${esc(t)}</span>`).join("") || '<span class="dim small">none</span>'}</div></div>
       <div class="ctx-sec"><div class="ctx-h">Schema catalog · ${(e.catalog || []).length}</div>${list(e.catalog, "mono")}</div>
       <div class="ctx-sec"><div class="ctx-h">Skills (manifest)</div><pre class="ctx-pre">${esc(e.skills || "(none)")}</pre></div>
@@ -615,6 +837,11 @@ function viewMission() {
     try {
       await streamSSE("/api/agent/run", { prompt: p, thread_id: state.mission }, (e) => {
         if (e.type === "context") renderCtx(e);
+        else if (e.type === "retrieval") step("ctx", "⇢ retrieval", `${(e.skills || []).filter((s) => s.selected).length} skills · ${(e.tools || []).filter((t) => t.selected).length} tools enter the window`);
+        else if (e.type === "context_size") $("#mc-tok").textContent = "~" + e.tokens.toLocaleString() + " / " + e.budget.toLocaleString() + " tokens";
+        else if (e.type === "skill_loaded") step("ctx", "⬇ skill " + esc(e.name), "+" + (e.tokens || 0).toLocaleString() + " tokens · " + (e.chars || 0).toLocaleString() + " chars of SKILL.md");
+        else if (e.type === "offload") step("ctx", "⇩ offload " + esc(e.tool), (e.chars || 0).toLocaleString() + " chars → archive " + esc(e.ref || ""));
+        else if (e.type === "compaction") step("ctx", "⌁ compaction (" + esc(e.scope) + ")", (e.saved || 0).toLocaleString() + " tokens saved");
         else if (e.type === "error") { body.innerHTML = `<span class="bad">${esc(e.message)}</span>`; step("err", "! error", esc(e.message)); }
         else if (e.type === "tool_call") step("call", "→ " + esc(e.name), esc(JSON.stringify(e.args || {}).slice(0, 120)));
         else if (e.type === "tool_result") {

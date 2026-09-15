@@ -52,3 +52,7 @@ class PromoteReq(BaseModel):
 class AgentReq(BaseModel):
     prompt: str
     thread_id: str = "appbook"
+
+
+class ThreadReq(BaseModel):
+    thread_id: str = "appbook"

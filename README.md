@@ -91,7 +91,7 @@ The AppBook is intentionally dependency-free in the browser and requires no fron
 | Semantic Layer | Meaning-based catalog search over the retail schema |
 | Skills & Automations | Tool/skill retrieval, registration, and scheduled work |
 | The Agent Loop | Context assembly, tool calls, results, and streamed answers |
-| Context Engineering | Context growth with and without compaction |
+| Context Engineering | A live context window: skill retrieval, runtime skill loading, compaction, offloads, and the vector archive |
 | Mission Control | A single console for chat, context, and automations |
 
 Read [`app/README.md`](app/README.md) for the AppBook-specific architecture and API notes.

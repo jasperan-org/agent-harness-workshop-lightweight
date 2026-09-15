@@ -244,6 +244,34 @@ def _ensure_tables():
     ddl(f'''CREATE TABLE agent_tool_log (
       id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY, tool VARCHAR2(120), payload CLOB,
       embedding VECTOR({DIM}, FLOAT32), created_at TIMESTAMP DEFAULT SYSTIMESTAMP)''')
+    ensure_context_archive()
+
+
+# Layer 8 — offloaded context. Compaction replaces older turns with a summary and keeps the raw
+# transcript; large tool results leave the window as a reference. Both land here (summary for the
+# prompt, body for rehydration), embedded so `recall_context` can pull them back by meaning.
+_ARCHIVE_DDL = (
+    f'''CREATE TABLE agent_context_archive (
+      id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY, thread_id VARCHAR2(200), kind VARCHAR2(30),
+      source_seq VARCHAR2(200), label VARCHAR2(300), seq_from NUMBER, seq_to NUMBER,
+      summary CLOB, body CLOB, body_chars NUMBER, embedding VECTOR({DIM}, FLOAT32),
+      created_at TIMESTAMP DEFAULT SYSTIMESTAMP,
+      CONSTRAINT agent_context_archive_uq UNIQUE (thread_id, kind, source_seq))''',
+    '''CREATE VECTOR INDEX agent_context_archive_hnsw ON agent_context_archive (embedding)
+      ORGANIZATION INMEMORY NEIGHBOR GRAPH DISTANCE COSINE WITH TARGET ACCURACY 95''',
+    '''CREATE INDEX agent_context_archive_thread_ix ON agent_context_archive (thread_id, created_at)''',
+)
+_archive_ready = False
+
+
+def ensure_context_archive():
+    """Idempotent DDL for the archive table, callable outside initialize() (lazy first write)."""
+    global _archive_ready
+    if _archive_ready:
+        return
+    for stmt in _ARCHIVE_DDL:
+        ddl(stmt)
+    _archive_ready = True
 
 
 def _seed_schema():
@@ -294,11 +322,33 @@ def _seed_schema():
 
 
 # ── encoding (write path) — via OracleVS ──────────────────────────────────
+# Oracle closes idle connections; the dedicated OracleVS connection is held for the life of the
+# process, so the first query after a quiet spell arrives on a dead socket (DPY-4011). Without a
+# reconnect, every vector route — retrieval, semantic catalog, skills, tools, Layer 8 archive —
+# answers 500 until the process restarts.
+_CONN_LOST = ("DPY-4011", "DPY-1001", "DPY-6005", "ORA-03113", "ORA-03114", "ORA-12541", "not connected")
+
+
+def _store_call(fn):
+    """Run fn(store) on the dedicated OracleVS connection, rebuilding the store once if lost."""
+    try:
+        with _vs_lock:
+            return fn(_build_store())
+    except Exception as e:
+        if not any(tok in str(e) for tok in _CONN_LOST):
+            raise
+        print(f"[db] vector store connection lost ({str(e).splitlines()[0][:80]}) — reconnecting.")
+        with _vs_lock:
+            _reset_runtime_state()
+            return fn(_build_store())
+
+
 def add_texts(texts, metadatas=None, namespace="knowledge"):
     metadatas = metadatas or [{} for _ in texts]
-    rows = [{**(m or {}), "namespace": namespace} for m in metadatas]   # distinct dicts; namespace in metadata
-    with _vs_lock:
-        _build_store().add_texts(list(texts), metadatas=rows)
+    # Build the rows inside the call: OracleVS annotates metadata in place, and a retry after a
+    # reconnected socket must not re-send dicts that already carry its reserved internal key.
+    _store_call(lambda store: store.add_texts(
+        list(texts), metadatas=[{**(m or {}), "namespace": namespace} for m in metadatas]))
     return len(texts)
 
 
@@ -325,9 +375,7 @@ def kw_search(query, namespace="knowledge", k=5):
     global _text_search_ok
     if _text_search_ok is not False:
         try:
-            with _vs_lock:
-                _build_store()
-                docs = _kw_retriever.invoke(query or "")
+            docs = _store_call(lambda store: _kw_retriever.invoke(query or ""))
             _mark_text_search(True)
             if namespace:
                 docs = [d for d in docs if d.metadata.get("namespace") == namespace]
@@ -363,8 +411,7 @@ def _substring_search(query, namespace="knowledge", k=5):
 
 def vec_search(query, namespace="knowledge", k=5):
     flt = {"namespace": namespace} if namespace else None
-    with _vs_lock:
-        pairs = _build_store().similarity_search_with_score(query, k=k, filter=flt)
+    pairs = _store_call(lambda store: store.similarity_search_with_score(query, k=k, filter=flt))
     return [dict(_row(d, dist), dist=dist) for d, dist in pairs]
 
 

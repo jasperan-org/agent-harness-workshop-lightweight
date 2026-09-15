@@ -13,10 +13,12 @@ The AppBook is a runnable, layer-by-layer demonstration of an enterprise agent h
 | 5. Semantic Layer | Catalog search over the seeded `AGENT` retail schema |
 | 6. Skills & Automations | Meaning-based tool/skill lookup and database-backed automations |
 | 7. The Agent Loop | Streamed context assembly, tool calls, tool results, and an answer |
-| 8. Context Engineering | Context growth with engineering off versus on |
+| 8. Context Engineering | Live window: skill retrieval, runtime skill loading, compaction, offloads, and the vector archive — plus the engineering off-vs-on baseline |
 | 9. Mission Control | Chat, live context, and automation controls in one console |
 
 The default business tables are `customers`, `products`, `orders`, `order_items`, and `v_revenue`. Startup is idempotent: it creates missing harness objects and demo rows without dropping or resetting existing data.
+
+Layer 8 is not a simulation: the agent loop streams the window it assembled (sections, per-message token counts), the skill and tool candidates it retrieved by meaning, each `load_skill` call that enlarges the window, every large tool result that is offloaded to `agent_context_archive`, and every compaction (older turns summarized into an archived recap). `POST /api/context/preview` assembles the same window without calling the model, so the chapter stays inspectable with no chat key; `GET /api/context/archive` lists what left the window and searches it by meaning.
 
 ## Prerequisites
 
@@ -65,6 +67,11 @@ EMBED_MODEL=ALL_MINILM_L12_V2
 RERANK_MODEL=RERANK_XENC
 VECTOR_DIM=384
 ORACLE_ENABLED=1
+# Layer 8 context engineering. The budget is deliberately small so the window fills and compacts
+# inside a short session; the model's real window is far larger.
+TR_CONTEXT_BUDGET=8000
+TR_HISTORY_MESSAGES=6
+TR_OFFLOAD_CHARS=2400
 ```
 
 A bare OCI regional endpoint is also accepted; the backend adds `/openai/v1` automatically. When `LLM_PROVIDER=openai`, set `OPENAI_API_KEY` and use an OpenAI model name. Provider-specific key selection prevents an OCI key from being sent to OpenAI accidentally.
@@ -98,7 +105,7 @@ From `app/`:
 ./run.sh
 ```
 
-For a static smoke check without a database, import the app with its dependencies installed and call `/`, `/styles.css`, `/app.js`, `/images/total_recall.png`, `/api/health`, and `/api/context/series`. The frontend JavaScript can be syntax-checked with `node --check frontend/app.js`.
+For a static smoke check without a database, import the app with its dependencies installed and call `/`, `/styles.css`, `/app.js`, `/images/total_recall.png`, `/api/health`, and `/api/context/series`. The frontend JavaScript can be syntax-checked with `node --check frontend/app.js`. With a database but no chat key, `POST /api/context/preview` and `GET /api/context/archive?thread_id=...` exercise the whole Layer 8 read path.
 
 ## Relationship to the notebook
 

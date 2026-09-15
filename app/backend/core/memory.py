@@ -72,14 +72,43 @@ def _ensure():
     return _oamp
 
 
-def remember(content: str) -> str:
+# Oracle closes idle connections and the OAMP client keeps one for the life of the process, so a
+# long-quiet appbook answers the first /api/memory/* or Layer 8 request with a dead-socket error
+# (DPY-4011). Reconnect once and retry; the cached thread objects go with the old connection.
+_CONN_LOST = db._CONN_LOST   # same dead-socket family the OracleVS store recovers from
+
+
+def _reset_oamp():
+    global _oamp, _conn
+    try:
+        if _conn is not None:
+            _conn.close()
+    except Exception:
+        pass
+    _oamp = None
+    _conn = None
+    _threads.clear()
+
+
+def _call(fn):
+    """Run fn(client) under the OAMP lock, reconnecting once if the database dropped the socket."""
     with _lock:
-        return _ensure().add_memory(content, user_id=U, agent_id=A)
+        try:
+            return fn(_ensure())
+        except Exception as e:
+            if not any(tok in str(e) for tok in _CONN_LOST):
+                raise
+            print(f"[memory] OAMP connection lost ({str(e).splitlines()[0][:80]}) — reconnecting.")
+            _reset_oamp()
+            return fn(_ensure())
+
+
+def remember(content: str) -> str:
+    return _call(lambda o: o.add_memory(content, user_id=U, agent_id=A))
 
 
 def recall(query: str, k: int = 5):
-    with _lock:
-        res = _ensure().search(query, user_id=U, agent_id=A, max_results=k)
+    res = _call(lambda o: o.search(query, user_id=U, agent_id=A, max_results=k))
     hits = []
     for r in res:
         record = getattr(r, "record", None)
@@ -94,36 +123,34 @@ def recall(query: str, k: int = 5):
     return hits
 
 
-def _thread(thread_id: str):
-    o = _ensure()
+def _thread(client, thread_id: str):
     if thread_id not in _threads:
         try:
-            _threads[thread_id] = o.create_thread(thread_id=thread_id, user_id=U, agent_id=A)
+            _threads[thread_id] = client.create_thread(thread_id=thread_id, user_id=U, agent_id=A)
         except Exception:
-            _threads[thread_id] = o.get_thread(thread_id)
+            _threads[thread_id] = client.get_thread(thread_id)
     return _threads[thread_id]
 
 
 def add_turn(thread_id: str, role: str, content: str):
-    with _lock:
-        _thread(thread_id).add_messages([{"role": role, "content": content}])
+    return _call(lambda o: _thread(o, thread_id).add_messages([{"role": role, "content": content}]))
 
 
 def get_turns(thread_id: str):
-    with _lock:
-        try:
-            return [{"role": m.role, "content": m.content} for m in _thread(thread_id).get_messages()]
-        except Exception:
-            return []
+    try:
+        return _call(lambda o: [{"role": m.role, "content": m.content}
+                                for m in _thread(o, thread_id).get_messages()])
+    except Exception:
+        return []
 
 
 def context_card(thread_id: str, recent: int = 6, relevant: int = 4):
-    with _lock:
-        try:
-            return _thread(thread_id).get_context_card(
-                fallback_message_count=recent, max_relevant_results=relevant, max_recent_messages=recent).content
-        except Exception:
-            return None
+    try:
+        return _call(lambda o: _thread(o, thread_id).get_context_card(
+            fallback_message_count=recent, max_relevant_results=relevant,
+            max_recent_messages=recent).content)
+    except Exception:
+        return None
 
 
 # ── procedural workflow memory (shared pool, no OAMP) ──────────────────────

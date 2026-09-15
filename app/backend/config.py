@@ -53,6 +53,14 @@ class Settings:
     model: str = os.environ.get("LLM_MODEL", "xai.grok-4.20-non-reasoning")
     max_tokens: int = int(os.environ.get("TR_MAX_TOKENS", "1536"))
 
+    # Context engineering (Layer 8). The budget is deliberately small so the window visibly
+    # fills and compacts inside one short workshop session; the model's real window is far
+    # larger. history_messages is how many recent turns travel as messages, offload_chars is
+    # the size above which a tool result leaves the window as an archive reference.
+    context_budget: int = int(os.environ.get("TR_CONTEXT_BUDGET", "8000"))
+    history_messages: int = int(os.environ.get("TR_HISTORY_MESSAGES", "6"))
+    offload_chars: int = int(os.environ.get("TR_OFFLOAD_CHARS", "2400"))
+
     # Identity used for OAMP memory in the app.
     user_id: str = os.environ.get("TR_USER_ID", "appbook_user")
     agent_id: str = os.environ.get("TR_AGENT_ID", "total_recall")
