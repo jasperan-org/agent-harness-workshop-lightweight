@@ -6,7 +6,7 @@
 
 ## What's pre-built
 
-The Codespace ran `the self-contained setup cells in `notebook_complete_with_setup_code.ipynb``, which provisions:
+The Codespace ran the self-contained setup cells in `enterprise_data_agent.ipynb`, which provisions:
 
 - A tablespace `AGENT_DBFS_TS` with a dedicated datafile.
 - A DBFS store `AGENT_SCRATCH` (`DBMS_DBFS_SFS.CREATEFILESYSTEM` + `DBMS_DBFS_CONTENT.REGISTERSTORE`).
@@ -59,6 +59,6 @@ No separate filesystem to secure.
 
 **`ORA-64001: path not found`** — File doesn't exist. Either `scratch.write` it first or catch `FileNotFoundError`.
 
-**`ORA-22288: file or LOB operation FILEOPEN failed`** — The DBFS store isn't mounted. Re-run `the self-contained setup cells in `notebook_complete_with_setup_code.ipynb``.
+**`ORA-22288: file or LOB operation FILEOPEN failed`** — The DBFS store isn't mounted. Re-run the self-contained setup cells in `enterprise_data_agent.ipynb`.
 
 **`PLS-00306: wrong number or types of arguments in call to PUTPATH`** — Wrong Oracle DBFS version. Ensure you're on Oracle 23ai / 26ai.

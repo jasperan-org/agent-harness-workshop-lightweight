@@ -52,6 +52,9 @@ GRANTS = [
     "GRANT CREATE JOB TO {a}",  # scheduled jobs / automations
     "GRANT EXECUTE ON DBMS_SCHEDULER TO {a}",
     "GRANT EXECUTE ON DBMS_VECTOR TO {a}",  # in-DB vectorisation
+    # Oracle Text: needed to create/maintain the CTXSYS.CONTEXT index the keyword retrieval rung
+    # uses (ctx_ddl.sync_index to refresh it). Swallowed by _IGNORE where Oracle Text is absent.
+    "GRANT EXECUTE ON CTX_DDL TO {a}",
     "GRANT SELECT_CATALOG_ROLE TO {a}",  # read the data dictionary
     "GRANT SELECT ON SYS.V_$SQL TO {a}",  # read the SQL workload
     "GRANT UNLIMITED TABLESPACE TO {a}",

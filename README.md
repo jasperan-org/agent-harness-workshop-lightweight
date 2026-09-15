@@ -11,7 +11,7 @@ There are two deliberately different learning surfaces:
 1. **The canonical workshop notebook** — [`notebook_student.ipynb`](notebook_student.ipynb) has five coding TODOs. You implement memory scanning, retrieval, hybrid ranking, a safe SQL tool, and the agent loop. [`notebook_complete.ipynb`](notebook_complete.ipynb) is the answer key.
 2. **The Total Recall AppBook** — [`app/`](app/) is a runnable FastAPI + vanilla JavaScript application with nine interactive harness layers. It is a guided demonstration of the ideas after (or alongside) the notebook.
 
-The default demo data is a small retail schema owned by `AGENT`: `customers`, `products`, `orders`, `order_items`, and `v_revenue`. The current AppBook and canonical notebook use this same domain. The older supply-chain implementation is preserved only as advanced reference material in [`notebook_complete_with_setup_code.ipynb`](notebook_complete_with_setup_code.ipynb), [`enterprise_data_agent.ipynb`](enterprise_data_agent.ipynb), and the Part 4/5/9/11 reference guides.
+The default demo data is a small retail schema owned by `AGENT`: `customers`, `products`, `orders`, `order_items`, and `v_revenue`. The current AppBook and canonical notebook use this same domain. The older supply-chain implementation is preserved only as advanced reference material in [`enterprise_data_agent.ipynb`](enterprise_data_agent.ipynb) and the Part 4/5/9/11 reference guides.
 
 ## The five-TODO learning path
 
@@ -108,19 +108,21 @@ Use these after the AppBook reports that Oracle is ready. They exercise the curr
 
 If no chat-model key is configured, the UI reports that explicitly; the database-backed probes and notebook setup still remain inspectable.
 
-## Advanced reference notebook
+## How the notebooks fit together
 
-[`notebook_complete_with_setup_code.ipynb`](notebook_complete_with_setup_code.ipynb) contains the original, fully self-contained supply-chain workshop, including optional Oracle MLE, JSON Relational Duality View, DBFS, and tool-output-offload material. It is useful when adapting the workshop to a richer Oracle environment, but it is not the five-TODO path and does not describe the current AppBook seed.
+| Notebook | Role |
+|---|---|
+| [`notebook_student.ipynb`](notebook_student.ipynb) | **Start here.** The five-TODO build path. Self-contained: it provisions the Oracle Text index its keyword leg needs, and runs end to end against the pre-seeded `AGENT` schema. |
+| [`notebook_complete.ipynb`](notebook_complete.ipynb) | The same notebook with all five TODOs solved — the answer key, or a reference to diff your work against. |
+| [`enterprise_data_agent.ipynb`](enterprise_data_agent.ipynb) | Advanced, fully self-contained reference: the original supply-chain workshop plus optional Oracle DBFS, MLE, JSON Relational Duality View and tool-output-offload material. Useful when adapting the workshop to a richer Oracle environment; not part of the five-TODO path. |
 
 ## Repository map
 
 ```text
 .devcontainer/                 Codespaces compose, bootstrap, and app startup
-notebook_student.ipynb         Canonical five-TODO student notebook
-notebook_complete.ipynb        Canonical five-TODO answer key
-notebook_complete_with_setup_code.ipynb
-                               Advanced self-contained reference notebook
-enterprise_data_agent.ipynb     Original long-form reference notebook
+notebook_student.ipynb         Entry point: canonical five-TODO student notebook
+notebook_complete.ipynb        The same notebook, all five TODOs solved
+enterprise_data_agent.ipynb     Advanced self-contained reference notebook
 app/                            FastAPI + vanilla JavaScript Total Recall AppBook
 docs/                           Core guides, advanced reference notes, and troubleshooting
 scripts/seed_oracle.py          Safe AGENT-schema/model bootstrap helper

@@ -17,7 +17,7 @@ Oracle AI Database 26ai Free ships MLE with JavaScript. Python MLE is a separate
 
 ## What's pre-built
 
-Nothing in Oracle itself — MLE is available out of the box on Oracle AI Database 26ai with the grants `the self-contained setup cells in `notebook_complete_with_setup_code.ipynb`` already gave to `AGENT`:
+Nothing in Oracle itself — MLE is available out of the box on Oracle AI Database 26ai with the grants the self-contained setup cells in `enterprise_data_agent.ipynb` already gave to `AGENT`:
 
 - `EXECUTE ON DBMS_MLE`
 - `EXECUTE DYNAMIC MLE`
