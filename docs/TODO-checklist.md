@@ -1,51 +1,25 @@
-# Workshop TODO Checklist
+# Workshop TODO checklist
 
-**9 hands-on coding TODOs across 11 parts.** Every "true setup" task (Oracle DDL, seed data, ONNX models) was run by the Codespace before you opened the notebook — you don't see it in the workshop notebook unless you open `notebook_complete_with_setup_code.ipynb` (the full-source version for advanced learners).
+The canonical workshop is the five-TODO path in `notebook_student.ipynb`. Each checkpoint is an assertion in the next notebook cell, so a failure identifies the unfinished block before later work depends on it.
 
-Each TODO has a **hard-stop assert checkpoint** right below it. If you skip a TODO or get it wrong, the next cell raises an `AssertionError` so you can't accidentally barrel forward with broken state.
+- [ ] **TODO 1 — `_scan_tables`** in Part 2. Read Oracle catalog metadata and emit `Fact` objects describing the `AGENT` retail tables.
+- [ ] **TODO 2 — `retrieve_knowledge`** in Part 3. Oversample OAMP memories, filter them, and rerank the useful candidates.
+- [ ] **TODO 3 — `hybrid_rrf_search_memories`** in Part 3. Fuse vector and Oracle Text ranks with Reciprocal Rank Fusion in one SQL statement.
+- [ ] **TODO 4 — `tool_run_sql`** in Part 6. Register a safe, read-only `SELECT`/`WITH` tool and return bounded JSON results.
+- [ ] **TODO 5 — `agent_turn`** in Part 7. Assemble context, call the model, dispatch tools, enforce iteration/time limits, and produce a final answer.
 
----
+## Before you start
 
-### Part 1 — Setup ([Guide](part-1-setup.md))
+- [ ] Codespace or local Oracle is reachable.
+- [ ] `ALL_MINILM_L12_V2` is available in the database.
+- [ ] The notebook kernel has the dependencies from `requirements.txt`.
+- [ ] `notebook_student.ipynb` opens from the repository root.
 
-*No TODO.* Just run the imports + `agent_conn` + chat client cells.
+## After the five TODOs
 
-### Part 2 — Long-Term Memory with OAMP ([Guide](part-2-oamp-memory.md))
+- [ ] Run the three-turn notebook demo on one thread.
+- [ ] Open the AppBook at `http://localhost:8000`.
+- [ ] Check the Foundation, Retrieval, Memory, Semantic Layer, Agent Loop, and Mission Control chapters.
+- [ ] Try a retail question such as “How many paid orders does each sales channel have?”
 
-1. Implement `_scan_tables` — mine `ALL_TABLES + ALL_TAB_COMMENTS` into Facts.  **TODO 1**
-
-### Part 3 — Retrieval ([Guide](part-3-retrieval.md))
-
-2. Implement `retrieve_knowledge` — cosine search + rerank.  **TODO 2**
-3. Implement `hybrid_rrf_search_memories` — vector + keyword fused via Reciprocal Rank Fusion in one SQL.  **TODO 3**
-
-*(The three-way RRF probe is a demo cell — run it and observe the `r_vec` / `r_txt` ranks.)*
-
-### Part 4 — DBFS Scratchpad ([Guide](part-4-dbfs.md))
-
-*No TODO.* Read the DBFS Python wrapper, smoke-test with `scratch.write` / `scratch.read`.
-
-### Part 5 — Oracle MLE Compute ([Guide](part-5-mle.md))
-
-*No TODO.* Read the `exec_js` helper, run the percentile smoke test.
-
-### Part 6 — Tools & Skills ([Guide](part-6-tools-and-skills.md))
-
-4. Register `tool_run_sql` with the `@register` decorator.  **TODO 4**
-
-### Part 7 — The Agent Loop ([Guide](part-7-agent-loop.md))
-
-5. Implement `agent_turn` — the dispatch loop.  **TODO 5**
-
-*(The three-turn end-to-end demo runs after the assert passes.)*
-
-
-### Part 9 — JSON Relational Duality Views ([Guide](part-9-duality-views.md))
-
-7. Register `tool_get_document` — read a full document by primary key.  **TODO 7**
-
-
-### Part 11 — Tool-Output Offload ([Guide](part-11-tool-output-offload.md))
-
-8. Implement `log_tool` — persist the full tool output as an OAMP memory keyed by `tool_call_id`.  **TODO 8**
-9. Register `tool_fetch_tool_output` — recover full bytes by `tool_call_id`.  **TODO 9**
+The `notebook_complete_with_setup_code.ipynb` notebook and Parts 4/5/9/11 are advanced reference material for the original supply-chain/Oracle-capabilities version. They are not additional required TODOs in the lightweight workshop.

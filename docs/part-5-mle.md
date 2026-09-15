@@ -1,3 +1,5 @@
+> **Advanced reference:** This is an advanced reference for the original self-contained notebook. Oracle MLE is not required by the current five-TODO notebook or AppBook path.
+
 # Part 5: Oracle MLE Compute Sandbox
 
 LLMs are unreliable at math. Percentiles, weighted means, post-fetch reshaping — anything quantitative — should run in a deterministic engine, not in the model's head. We route those snippets through Oracle's **Multilingual Engine (MLE)** — JavaScript that runs *inside* the Oracle process, called via [`DBMS_MLE`](https://docs.oracle.com/en/database/oracle/oracle-database/26/dbmle/index.html).
@@ -15,7 +17,7 @@ Oracle AI Database 26ai Free ships MLE with JavaScript. Python MLE is a separate
 
 ## What's pre-built
 
-Nothing in Oracle itself — MLE is available out of the box on Oracle AI Database 26ai with the grants `app/scripts/bootstrap.py` already gave to `AGENT`:
+Nothing in Oracle itself — MLE is available out of the box on Oracle AI Database 26ai with the grants `the self-contained setup cells in `notebook_complete_with_setup_code.ipynb`` already gave to `AGENT`:
 
 - `EXECUTE ON DBMS_MLE`
 - `EXECUTE DYNAMIC MLE`

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Runs on every container start — auto-starts the appbook so the frontend loads.
+# Runs on every container start — provision-if-needed, then auto-start the appbook so the
+# frontend loads. Both steps are idempotent and safe to re-run.
 HERE="$(dirname "$0")"
 
 # Give the appbook the SAME env the notebook has. This lifecycle hook is a non-interactive shell, so
@@ -7,6 +8,35 @@ HERE="$(dirname "$0")"
 # get — which is why the appbook's OCI calls were 502-ing. Materialise app/.env from whatever env IS
 # visible; backend/config.py loads it so the server reads identical config. (Idempotent.)
 bash "$HERE/../scripts/write_app_env.sh" || true
+
+# Make the harness present before starting the app. The database lives in a named volume: it
+# survives restarts, but a recreated/empty volume (docker compose down -v, a rebuilt container) or
+# a fresh Codespace whose postCreate seeding raced the database leaves the AGENT user or the ONNX
+# embedder missing — every semantic / retrieval / memory call then fails while the UI still serves.
+# Sourcing app/.env first means this works even when the lifecycle shell has no Oracle env.
+ENV_FILE="$HERE/../app/.env"
+if [ -f "$ENV_FILE" ]; then set -a; . "$ENV_FILE"; set +a; fi
+if ! python - <<'PY' 2>/dev/null
+import os, sys, oracledb
+oracledb.defaults.fetch_lobs = False
+try:
+    conn = oracledb.connect(user=os.environ.get("ORA_AGENT_USER", "AGENT"),
+                            password=os.environ.get("ORA_AGENT_PWD", "AgentPw_2026"),
+                            dsn=os.environ.get("ORA_DSN", "localhost:1521/FREEPDB1"))
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM user_mining_models WHERE model_name=:m",
+                {"m": os.environ.get("EMBED_MODEL", "ALL_MINILM_L12_V2")})
+    ready = cur.fetchone()[0] > 0
+    conn.close()
+except Exception:
+    ready = False
+sys.exit(0 if ready else 1)
+PY
+then
+  echo "▸ Oracle harness not provisioned — running scripts/seed_oracle.py (idempotent)…"
+  python "$HERE/../scripts/seed_oracle.py" \
+    || echo "  ⚠ seeding did not finish — the app will start but semantic layers stay warming. Re-run: python scripts/seed_oracle.py"
+fi
 
 cd "$HERE/../app" || exit 0
 

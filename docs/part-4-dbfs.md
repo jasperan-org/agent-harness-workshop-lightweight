@@ -1,10 +1,12 @@
+> **Advanced reference:** This is an advanced reference for the original self-contained notebook. The current lightweight AppBook uses an `agent_scratch` SecureFile LOB table for scratch content; it does not require Oracle DBFS or add another canonical TODO.
+
 # Part 4: DBFS Scratchpad
 
 [Oracle DBFS (Database File System)](https://docs.oracle.com/en/database/oracle/oracle-database/26/adlob/database-filesystem-DBFS-intro.html) is a POSIX-like filesystem layered on SecureFile LOBs in a table. The agent sees files and directories; the database sees rows. Same backups, same audit, same security model as everything else in the harness — but with `open()`/`read()`/`write()` ergonomics.
 
 ## What's pre-built
 
-The Codespace ran `app/scripts/bootstrap.py`, which provisions:
+The Codespace ran `the self-contained setup cells in `notebook_complete_with_setup_code.ipynb``, which provisions:
 
 - A tablespace `AGENT_DBFS_TS` with a dedicated datafile.
 - A DBFS store `AGENT_SCRATCH` (`DBMS_DBFS_SFS.CREATEFILESYSTEM` + `DBMS_DBFS_CONTENT.REGISTERSTORE`).
@@ -57,6 +59,6 @@ No separate filesystem to secure.
 
 **`ORA-64001: path not found`** — File doesn't exist. Either `scratch.write` it first or catch `FileNotFoundError`.
 
-**`ORA-22288: file or LOB operation FILEOPEN failed`** — The DBFS store isn't mounted. Re-run `app/scripts/bootstrap.py`.
+**`ORA-22288: file or LOB operation FILEOPEN failed`** — The DBFS store isn't mounted. Re-run `the self-contained setup cells in `notebook_complete_with_setup_code.ipynb``.
 
 **`PLS-00306: wrong number or types of arguments in call to PUTPATH`** — Wrong Oracle DBFS version. Ensure you're on Oracle 23ai / 26ai.

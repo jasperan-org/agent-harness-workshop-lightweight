@@ -1,4 +1,4 @@
-# Dev container = the `app` service + a local Oracle AI Database (23ai/26ai Free).
+# Dev container = the `app` service + a local Oracle AI Database 26ai Free.
 #   • oracle — the single converged engine the whole harness runs on: the warehouse,
 #     in-database ONNX embeddings, HNSW + Oracle Text retrieval, OAMP cognitive memory,
 #     the tool / skill registries, and DBMS_SCHEDULER automations.
@@ -7,23 +7,31 @@
 # The database persists across restarts via a named volume.
 services:
   oracle:
-    image: gvenzl/oracle-free:latest
+    # Oracle AI Database 26ai Free (official image). Use this image, not a *-slim community
+    # variant: slim images ship neither Oracle Text (no CTXSYS / CONTAINS operator, which the
+    # keyword + hybrid retrieval rungs need) nor DBMS_VECTOR_CHAIN.
+    image: container-registry.oracle.com/database/free:latest
     restart: unless-stopped
-    shm_size: "1g"
+    shm_size: "2g"
+    # Expose Oracle only to the local host for local runs; service traffic still uses oracle:1521.
+    ports:
+      - "127.0.0.1:${ORACLE_PORT:-1521}:1521"
     environment:
-      ORACLE_PASSWORD: OraclePwd_2025 # the SYS / SYSTEM password (used as ORA_ADMIN_PWD below)
+      ORACLE_PWD: OraclePwd_2025 # the SYS / SYSTEM / PDBADMIN password (used as ORA_ADMIN_PWD below)
     volumes:
       - oracle-data:/opt/oracle/oradata # persist the database across restarts
-      # Allocate the Vector Memory Pool (256M) so HNSW can build. The Free image defaults it to 0,
+      # Allocate the Vector Memory Pool (256M) so HNSW can build. Free images default it to 0,
       # and going 0 -> non-zero needs a restart, so this hook sets it + bounces the instance ONCE
       # (conditional/idempotent — a no-op once the pool is allocated). Must stay executable.
-      - ./oracle-init/vector-memory.sh:/container-entrypoint-startdb.d/01-vector-memory.sh:ro
+      # 26ai Free runs /opt/oracle/scripts/startup/*.sh on every container start; the community
+      # gvenzl images instead use /container-entrypoint-startdb.d/.
+      - ./oracle-init/vector-memory.sh:/opt/oracle/scripts/startup/01-vector-memory.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "healthcheck.sh"]
+      test: ["CMD-SHELL", "/opt/oracle/checkDBStatus.sh"]
       interval: 15s
       timeout: 10s
       retries: 40
-      start_period: 90s
+      start_period: 120s
 
   app:
     image: mcr.microsoft.com/devcontainers/python:3.12
@@ -47,7 +55,9 @@ services:
       OCI_GENAI_API_KEY_3: ${OCI_GENAI_API_KEY_3:-}
       OCI_GENAI_API_KEY_4: ${OCI_GENAI_API_KEY_4:-}
       OCI_GENAI_ENDPOINT: https://inference.generativeai.us-phoenix-1.oci.oraclecloud.com
-      LLM_MODEL: xai.grok-4-1-fast-reasoning # OCI GenAI model id (e.g. xai.grok-4-1-fast-reasoning, gpt-5.5-mini)
+      # Verified against this endpoint/tenancy: xai.grok-4.20-non-reasoning | xai.grok-4.20-reasoning |
+      # xai.grok-4.3 | google.gemini-2.5-flash. Retired ids (e.g. xai.grok-4-1-fast-reasoning) 404.
+      LLM_MODEL: xai.grok-4.20-non-reasoning
       # ── Oracle AI Database (shared by the notebook and the appbook) ──
       ORA_DSN: oracle:1521/FREEPDB1 # reach the DB by its compose service name
       ORA_ADMIN_USER: SYS

@@ -42,6 +42,11 @@ def _openai_tools(names):
 
 
 async def run_agent(prompt: str, thread_id: str = "appbook"):
+    if not settings.llm_api_key:
+        yield {"type": "error", "message": "No chat-model API key is configured. Set OCI_GENAI_API_KEY (or OPENAI_API_KEY when using LLM_PROVIDER=openai), then restart the app."}
+        yield {"type": "done", "tools_used": []}
+        return
+
     await asyncio.to_thread(memory.add_turn, thread_id, "user", prompt)
 
     catalog = await asyncio.to_thread(db.semantic_search, prompt, 5)

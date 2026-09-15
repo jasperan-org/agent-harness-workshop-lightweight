@@ -4,12 +4,13 @@ Warms the harness (connects to the AGENT schema, creates anything missing
 idempotently) in the background on startup, mounts one router group per layer,
 and serves the dependency-free SPA from the same origin.
 
-Run from the appbook/ directory:
+Run from the ``app/`` directory:
     uvicorn backend.main:app --reload --port 8000
 """
 from __future__ import annotations
 
 import threading
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -22,10 +23,16 @@ from backend.routers import agentloop, automations, layers, memory, skills
 
 
 def _warm():
-    try:
-        db.initialize()
-    except Exception:
-        pass  # status() records the error; the frontend still serves with a badge
+    # Oracle can report healthy before the listener accepts application sessions. Retry a
+    # bounded number of times so a normal startup race does not strand the app at "warming".
+    for attempt in range(1, 31):
+        try:
+            db.initialize()
+            return
+        except Exception:
+            if attempt == 30:
+                return  # status() records the final error; the frontend still serves
+            time.sleep(min(2 * attempt, 10))
 
 
 @asynccontextmanager

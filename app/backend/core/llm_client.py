@@ -33,6 +33,12 @@ _base = settings.oci_endpoint if settings.llm_provider == "oci" else None
 MODEL = settings.model
 MAX_TOKENS = settings.max_tokens
 
+# OCI GenAI answers SSE streams with content-encoding: zstd. httpx's streaming decoder can only
+# consume a zstd frame once and raises "cannot use a decompressobj multiple times", which kills
+# every streamed chat (/api/memory/chat). Asked to send responses uncompressed instead -- SSE
+# payloads are tiny and this is model-independent (it reproduces on every model on the endpoint).
+_NO_ZSTD = {"Accept-Encoding": "identity"}
+
 _keys = load_oci_keys() if (_ROTATION and settings.llm_provider == "oci") else []
 _rotator = KeyRotator(_keys) if _keys else None
 
@@ -76,12 +82,13 @@ if _rotator is not None:
             comp = (_RotatingAsyncCompletions if async_ else _RotatingCompletions)(build)
             self.chat = _RotatingChat(comp)
 
-    client = _RotatingClient(lambda key: OpenAI(api_key=key, base_url=_base))
-    async_client = _RotatingClient(lambda key: AsyncOpenAI(api_key=key, base_url=_base), async_=True)
+    client = _RotatingClient(lambda key: OpenAI(api_key=key, base_url=_base, default_headers=_NO_ZSTD))
+    async_client = _RotatingClient(
+        lambda key: AsyncOpenAI(api_key=key, base_url=_base, default_headers=_NO_ZSTD), async_=True)
     print(f"[llm_client] OCI key rotation active: {len(_rotator)} key(s); "
           f"this worker starts on key #{_rotator.current_index() + 1}.")
 else:
     # ---- single-key path (no rotation configured / non-OCI provider) ----
     _key = settings.llm_api_key or "LLM_API_KEY_NOT_SET"
-    client = OpenAI(api_key=_key, base_url=_base)
-    async_client = AsyncOpenAI(api_key=_key, base_url=_base)
+    client = OpenAI(api_key=_key, base_url=_base, default_headers=_NO_ZSTD)
+    async_client = AsyncOpenAI(api_key=_key, base_url=_base, default_headers=_NO_ZSTD)

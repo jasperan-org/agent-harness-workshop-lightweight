@@ -393,6 +393,7 @@ function viewMemory() {
     try {
       await streamSSE("/api/memory/chat", { message: t, thread_id: state.chat }, (ev) => {
         if (ev.type === "delta") { acc += ev.text; out.innerHTML = renderRich(acc); log.scrollTop = log.scrollHeight; }
+        else if (ev.type === "error") { out.innerHTML = `<span class="bad">${esc(ev.message)}</span>`; }
         else if (ev.type === "done") { $("#mm-card-out").textContent = ev.card || "(empty)"; }
       }, state.abort.signal);
     } catch (e) { out.innerHTML = `<span class="bad">Error: ${esc(e.message)}</span>`; } finally { state.abort = null; }
@@ -456,7 +457,7 @@ function viewSkills() {
   // skills source + refresh
   $("#sk-reg").addEventListener("click", async () => {
     const d = await postJSON("/api/skills/register_source", { name: $("#sk-sname").value, description: $("#sk-sdesc").value, body: $("#sk-sbody").value });
-    $("#sk-skout").innerHTML = `<span class="good">registered ${esc(d.skill)} · sha ${esc(d.sha)}</span> — now edit the body and press Refresh to see the SHA change.`;
+    $("#sk-skout").innerHTML = `<span class="good">registered ${esc(d.skill)} · sha ${esc(d.sha)}</span> — press Register again with edited content, then use Refresh to verify source changes.`;
     loadSkills();
   });
   $("#sk-refresh").addEventListener("click", async () => { const d = await postJSON("/api/skills/refresh", {}); $("#sk-skout").innerHTML = d.updated && d.updated.length ? `<span class="good">refreshed (SHA changed): ${esc(d.updated.join(", "))}</span>` : "no changes detected (SHA identical)"; loadSkills(); });
@@ -496,6 +497,7 @@ function viewAgent() {
     try {
       await streamSSE("/api/agent/run", { prompt: p, thread_id: state.agent }, (e) => {
         if (e.type === "context") { ev("ctx", `<b>assemble_context</b> · ${e.tools.length} tools · ${e.catalog.length} catalog hits`); if (e.card) ev("ctx dim", "context card: " + esc((e.card || "").replace(/\s+/g, " ").slice(0, 90)) + "…"); }
+        else if (e.type === "error") { ans.innerHTML = `<span class="bad">${esc(e.message)}</span>`; ev("err", esc(e.message)); }
         else if (e.type === "tool_call") ev("call", `→ <b>${esc(e.name)}</b>(${esc(JSON.stringify(e.args).slice(0, 80))})`);
         else if (e.type === "tool_result") ev("res", `← ${esc(e.name)}: <span class="dim">${esc((e.preview || "").slice(0, 110))}</span>`);
         else if (e.type === "delta") { acc += e.text; ans.innerHTML = renderRich(acc) + '<span class="caret"></span>'; }
@@ -613,6 +615,7 @@ function viewMission() {
     try {
       await streamSSE("/api/agent/run", { prompt: p, thread_id: state.mission }, (e) => {
         if (e.type === "context") renderCtx(e);
+        else if (e.type === "error") { body.innerHTML = `<span class="bad">${esc(e.message)}</span>`; step("err", "! error", esc(e.message)); }
         else if (e.type === "tool_call") step("call", "→ " + esc(e.name), esc(JSON.stringify(e.args || {}).slice(0, 120)));
         else if (e.type === "tool_result") {
           step("res", "✓ " + esc(e.name), esc((e.preview || "").replace(/\s+/g, " ").slice(0, 140)));

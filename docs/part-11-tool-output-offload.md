@@ -1,3 +1,5 @@
+> **Advanced reference:** This is an advanced reference for the original self-contained notebook. Tool-output offload is not required by the current five-TODO notebook or AppBook path.
+
 # Part 11: Tool-Output Offload
 
 The Part 7 `agent_turn` inlines every tool result verbatim into the next message. That's fine for short outputs but **blows the context window** on a 50-row `run_sql`, a multi-KB skill body, or a long `exec_js` log. Part 11 fixes that.

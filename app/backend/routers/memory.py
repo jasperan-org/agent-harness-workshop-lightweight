@@ -7,6 +7,7 @@ import asyncio
 from fastapi import APIRouter
 from fastapi.concurrency import run_in_threadpool
 
+from backend.config import settings
 from backend.core import memory
 from backend.core.llm_client import async_client, MODEL
 from backend.core.sse import sse_response
@@ -17,6 +18,14 @@ router = APIRouter(prefix="/api/memory", tags=["memory"])
 
 @router.post("/chat")
 async def chat(req: ChatReq):
+    # Return a useful SSE response before touching Oracle when chat credentials are absent.
+    # This keeps the memory chapter inspectable in a freshly configured Codespace.
+    if not settings.llm_api_key:
+        async def missing_key_events():
+            yield {"type": "error", "message": "No chat-model API key is configured. Set OCI_GENAI_API_KEY (or OPENAI_API_KEY when using LLM_PROVIDER=openai), then restart the app."}
+            yield {"type": "done", "card": ""}
+        return sse_response(missing_key_events())
+
     await run_in_threadpool(memory.add_turn, req.thread_id, "user", req.message)
     card = await run_in_threadpool(memory.context_card, req.thread_id) or ""
     system = ("You are a concise analytics assistant. The block below is your working memory "
@@ -25,14 +34,19 @@ async def chat(req: ChatReq):
 
     async def events():
         parts = []
-        stream = await async_client.chat.completions.create(
-            model=MODEL, stream=True,
-            messages=[{"role": "system", "content": system}, {"role": "user", "content": req.message}])
-        async for chunk in stream:
-            text = chunk.choices[0].delta.content or ""
-            if text:
-                parts.append(text)
-                yield {"type": "delta", "text": text}
+        try:
+            stream = await async_client.chat.completions.create(
+                model=MODEL, stream=True,
+                messages=[{"role": "system", "content": system}, {"role": "user", "content": req.message}])
+            async for chunk in stream:
+                text = chunk.choices[0].delta.content or ""
+                if text:
+                    parts.append(text)
+                    yield {"type": "delta", "text": text}
+        except Exception as exc:
+            yield {"type": "error", "message": f"Chat request failed: {str(exc).splitlines()[0]}"}
+            yield {"type": "done", "card": card}
+            return
         reply = "".join(parts)
         await asyncio.to_thread(memory.add_turn, req.thread_id, "assistant", reply)
         new_card = await asyncio.to_thread(memory.context_card, req.thread_id) or ""

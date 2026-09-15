@@ -38,7 +38,17 @@ def retrieve_tools(query, k=6):
 
 def get_tool_schema(name):
     r = db.q("SELECT tool_schema FROM agent_tools WHERE name=:n", {"n": name})
-    return r[0]["TOOL_SCHEMA"] if r else None
+    if not r:
+        return None
+    schema = r[0]["TOOL_SCHEMA"]
+    if isinstance(schema, (bytes, bytearray)):
+        schema = schema.decode("utf-8", errors="replace")
+    if isinstance(schema, str):
+        try:
+            schema = json.loads(schema)
+        except json.JSONDecodeError:
+            return None
+    return schema if isinstance(schema, dict) else None
 
 
 # ── doer tools ──────────────────────────────────────────────────────────────

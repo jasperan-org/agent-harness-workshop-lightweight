@@ -1,6 +1,6 @@
 """Central configuration for the Total Recall appbook.
 
-Reads the same environment the notebook uses (Oracle creds, Anthropic key, model
+Reads the same environment the notebook uses (Oracle creds, GenAI key, model
 names) so the app runs against the very harness the notebook builds. A single
 ``settings`` object is imported across the backend.
 """
@@ -11,7 +11,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-APP_DIR = Path(__file__).resolve().parent.parent          # .../appbook
+APP_DIR = Path(__file__).resolve().parent.parent          # .../app
 BACKEND_DIR = APP_DIR / "backend"
 FRONTEND_DIR = APP_DIR / "frontend"
 
@@ -38,13 +38,19 @@ class Settings:
 
     # Chat model — OCI Generative AI via its OpenAI-compatible endpoint (Oracle powers the model too).
     # The only outbound network call. Set LLM_PROVIDER=openai to use OpenAI directly instead.
-    llm_provider: str = os.environ.get("LLM_PROVIDER", "oci")
+    llm_provider: str = os.environ.get("LLM_PROVIDER", "oci").strip().lower()
     oci_endpoint: str = os.environ.get(
         "OCI_GENAI_ENDPOINT", "https://inference.generativeai.us-phoenix-1.oci.oraclecloud.com"
+    ).rstrip("/")
+    if llm_provider == "oci" and not oci_endpoint.endswith("/openai/v1"):
+        oci_endpoint = f"{oci_endpoint}/openai/v1"
+    # Use the key for the selected provider. This avoids accidentally sending an OCI key
+    # to OpenAI when both are present in a developer environment.
+    llm_api_key: str | None = (
+        os.environ.get("OCI_GENAI_API_KEY") if llm_provider == "oci"
+        else os.environ.get("OPENAI_API_KEY")
     )
-    # OCI_GENAI_API_KEY when LLM_PROVIDER=oci; OPENAI_API_KEY when LLM_PROVIDER=openai.
-    llm_api_key: str | None = os.environ.get("OCI_GENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    model: str = os.environ.get("LLM_MODEL", "xai.grok-4-1-fast-reasoning")
+    model: str = os.environ.get("LLM_MODEL", "xai.grok-4.20-non-reasoning")
     max_tokens: int = int(os.environ.get("TR_MAX_TOKENS", "1536"))
 
     # Identity used for OAMP memory in the app.

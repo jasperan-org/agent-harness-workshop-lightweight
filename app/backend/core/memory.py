@@ -12,6 +12,7 @@ import threading
 
 import numpy as np
 import oracledb
+from oracleagentmemory.apis.embedders.embedder import IEmbedder
 
 from backend.config import settings
 from backend.core import db
@@ -24,7 +25,16 @@ EMB = settings.embed_model
 U, A = settings.user_id, settings.agent_id
 
 
-class _InDBOnnxEmbedder:
+class _InDBOnnxEmbedder(IEmbedder):
+    """In-database ONNX embedder for OAMP.
+
+    Must subclass IEmbedder: the package reads ``embedder.embedding_dimension`` when the
+    memory client is constructed, and the ABC is what infers it (and max_input_tokens) from
+    the first embed call. Without the base class, _ensure() raised
+    "AttributeError: '_InDBOnnxEmbedder' object has no attribute 'embedding_dimension'" and
+    every /api/memory/* route returned HTTP 500. Mirrors OracleONNXEmbedder in the notebook.
+    """
+
     def __init__(self, conn):
         self.conn = conn
     def embed(self, texts, *, is_query=False):
@@ -70,7 +80,18 @@ def remember(content: str) -> str:
 def recall(query: str, k: int = 5):
     with _lock:
         res = _ensure().search(query, user_id=U, agent_id=A, max_results=k)
-    return [{"content": r.content, "distance": round(float(getattr(r, "distance", 0) or 0), 4)} for r in res]
+    hits = []
+    for r in res:
+        record = getattr(r, "record", None)
+        distance = getattr(r, "distance", None)
+        if distance is None and record is not None:
+            distance = record.get("distance") if isinstance(record, dict) else getattr(record, "distance", None)
+        try:
+            distance = round(float(distance), 4) if distance is not None else None
+        except (TypeError, ValueError):
+            distance = None
+        hits.append({"content": r.content, "distance": distance})
+    return hits
 
 
 def _thread(thread_id: str):

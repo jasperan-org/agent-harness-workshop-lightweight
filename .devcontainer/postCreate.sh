@@ -22,13 +22,14 @@ echo "▸ Provisioning the Oracle AI Database (AGENT user + in-DB ONNX embedder)
 # Creates the least-privilege AGENT schema and loads the 384-dim embedder so the appbook can warm.
 # Idempotent and retrying — safe to re-run. The appbook builds its own tables / registries / seeded
 # commerce schema on startup; the notebook builds the same harness as you work through it.
-python scripts/seed_oracle.py || echo "  (Oracle not ready yet — re-run later: python scripts/seed_oracle.py)"
+python scripts/seed_oracle.py || echo "  ⚠ Oracle provisioning did NOT complete — the in-DB ONNX embedder may be missing, which breaks every semantic/retrieval call. Re-run: python scripts/seed_oracle.py"
 
 cat <<'EOF'
 
 ✓ Setup complete.
   • The appbook auto-starts on port 8000 (a preview opens). Restart it:  cd app && ./run.sh
   • App log:        /tmp/total-recall-app.log
-  • Build the harness yourself:  total_recall_student.ipynb   (answer key: total_recall_complete.ipynb)
-  • Per-TODO guides + copy-paste solutions:  docs/todo1.md … docs/todo19.md
+  • Build the harness yourself:  notebook_student.ipynb   (answer key: notebook_complete.ipynb)
+  • Core guides:  docs/part-1-setup.md … docs/part-7-agent-loop.md
+  • Advanced reference:  notebook_complete_with_setup_code.ipynb, enterprise_data_agent.ipynb, and docs/part-4-dbfs.md, docs/part-5-mle.md, docs/part-9-duality-views.md, docs/part-11-tool-output-offload.md
 EOF

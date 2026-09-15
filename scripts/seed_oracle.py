@@ -52,10 +52,17 @@ GRANTS = [
     "GRANT CREATE JOB TO {a}",  # scheduled jobs / automations
     "GRANT EXECUTE ON DBMS_SCHEDULER TO {a}",
     "GRANT EXECUTE ON DBMS_VECTOR TO {a}",  # in-DB vectorisation
-    "GRANT EXECUTE ON DBMS_VECTOR_CHAIN TO {a}",
     "GRANT SELECT_CATALOG_ROLE TO {a}",  # read the data dictionary
     "GRANT SELECT ON SYS.V_$SQL TO {a}",  # read the SQL workload
     "GRANT UNLIMITED TABLESPACE TO {a}",
+]
+
+# Granted only when the image actually ships the package. DBMS_VECTOR_CHAIN is absent on
+# gvenzl/oracle-free:23-slim; unconditionally granting it raised ORA-04042, which aborted this
+# script *before* the ONNX loader below -- leaving the app without ALL_MINILM_L12_V2 and making
+# every semantic / retrieval / embedding call fail. A missing optional package must not be fatal.
+OPTIONAL_GRANTS = [
+    ("DBMS_VECTOR_CHAIN", "GRANT EXECUTE ON DBMS_VECTOR_CHAIN TO {a}"),
 ]
 
 # 'already exists' / 'does not exist' family — safe to swallow so the script is idempotent.
@@ -98,6 +105,20 @@ def is_model_loaded(conn, model_name):
             "SELECT 1 FROM user_mining_models WHERE model_name = :m", {"m": model_name.upper()}
         )
         return cur.fetchone() is not None
+    finally:
+        cur.close()
+
+
+def package_present(conn, name):
+    """Whether the database ships a package/synonym (gates the optional grants above)."""
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "SELECT COUNT(*) FROM all_objects WHERE object_name = :n "
+            "AND object_type IN ('PACKAGE', 'SYNONYM')",
+            {"n": name.upper()},
+        )
+        return cur.fetchone()[0] > 0
     finally:
         cur.close()
 
@@ -149,6 +170,11 @@ def main():
     for g in GRANTS:
         ddl_idempotent(admin, g.format(a=AGENT))
     print(f"  user {AGENT} ready ({len(GRANTS)} grants applied idempotently)")
+    for obj, grant in OPTIONAL_GRANTS:
+        if package_present(admin, obj):
+            ddl_idempotent(admin, grant.format(a=AGENT))
+        else:
+            print(f"  note: {obj} is not present on this image — skipping its grant")
     admin.close()
 
     # 2) As AGENT, load the embedder so the model is owned by the AGENT schema (the appbook's

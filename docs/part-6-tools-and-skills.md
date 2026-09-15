@@ -1,6 +1,6 @@
 # Part 6: Tools & Skills
 
-The agent needs a way to *do things* in the world — execute SQL, run code, write to a scratchpad, fetch a document. In this harness:
+The agent needs a small, discoverable way to *do things* in the database — run safe SQL, search knowledge, scan a schema, save a correction, and load a skill. In this harness:
 
 | Concept | Lives in | Consumed as |
 |---|---|---|
@@ -11,9 +11,9 @@ Both use the same retrieval primitive — vector search over an in-database HNSW
 
 ## Why Vector-Indexed Tools?
 
-If the registry has 6 tools, it'''s harmless to put them all in every LLM call. Once you have 30+ tools (per-system MCP servers, per-team helpers), the model starts confusing them and the per-turn token bill grows linearly with the registry. Indexing tools by an embedding of `name + description + arg names` lets us pass *only the relevant top-k* for a given user query.
+If the registry has 6 tools, it's harmless to put them all in every LLM call. Once you have 30+ tools (per-system MCP servers, per-team helpers), the model starts confusing them and the per-turn token bill grows linearly with the registry. Indexing tools by an embedding of `name + description + arg names` lets us pass *only the relevant top-k* for a given user query.
 
-We still always include a small **always-on** set — `run_sql`, `search_knowledge`, `remember`, `exec_js`, `load_skill` — they'''re cheap and the agent calls them on almost every turn.
+The canonical notebook keeps a small core set available — `run_sql`, `search_knowledge`, `remember`, and `scan_database`. The AppBook has its own live registry for skills and automations.
 
 ![Toolbox flow — registration vs per-turn retrieval](../images/cover-toolbox-flow.png)
 
@@ -53,11 +53,11 @@ Three things happen:
 2. **Embedding in SQL** — `VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :etext AS DATA)` runs *inside* the database. No Python embedder.
 3. **MERGE** — re-running `@register fn` updates the row in place. Re-defining a tool is a one-line change.
 
-The `_build_schema` helper requires every tool to have a docstring — without one, retrieval would have nothing to embed. **Always write a docstring.** It is the tool'''s public spec.
+The `_build_schema` helper requires every tool to have a docstring — without one, retrieval would have nothing to embed. **Always write a docstring.** It is the tool's public spec.
 
 ## TODO 4: Register `tool_run_sql`
 
-`run_sql` is the agent'''s primary way to query live data. It must be **read-only** — `SELECT` and `WITH` only, no DDL, no DML. The agent shouldn'''t be able to `DROP TABLE` even if a hostile prompt asks it to.
+`run_sql` is the agent's primary way to query live data. It must be **read-only** — `SELECT` and `WITH` only, no DDL, no DML. The agent shouldn't be able to `DROP TABLE` even if a hostile prompt asks it to.
 
 The `_READ_ONLY` regex is pre-defined:
 
@@ -67,7 +67,7 @@ _READ_ONLY = re.compile(r"^\s*(select|with)\b", re.IGNORECASE)
 
 **Your job:** decorate a function `tool_run_sql(sql: str, max_rows: int = 50) -> str` with `@register`. The function:
 
-1. Rejects any statement that doesn'''t match `_READ_ONLY`.
+1. Rejects any statement that doesn't match `_READ_ONLY`.
 2. Executes the SQL on `agent_conn`.
 3. Returns up to `max_rows` rows as JSON: `{"columns": [...], "rows": [...], "row_count": N}`.
 4. On any database error, returns `{"error": "..."}`.
@@ -80,7 +80,7 @@ CLOB columns need special handling — `v.read() if hasattr(v, "read") else v` f
 @register
 def tool_run_sql(sql: str, max_rows: int = 50) -> str:
     """Execute a READ-ONLY SQL statement (SELECT/WITH only) against the target Oracle AI Database
-    and return up to `max_rows` rows as JSON. Reject any statement that isn'''t read-only.
+    and return up to `max_rows` rows as JSON. Reject any statement that isn't read-only.
     """
     if not _READ_ONLY.match(sql.strip()):
         return json.dumps({"error": "only SELECT / WITH statements are allowed in run_sql"})
@@ -102,29 +102,27 @@ def tool_run_sql(sql: str, max_rows: int = 50) -> str:
 Notice three things:
 
 - **The docstring is the tool description.** It tells the LLM *when* to call this tool, not just *how*. Prefer "Use this when..." phrasing.
-- **`json.dumps(..., default=str)`** handles `datetime`, `Decimal`, etc. that aren'''t JSON-native. Without this, dates raise `TypeError`.
-- **Error handling returns JSON.** The LLM reads the tool output as a string; an error in JSON form is something it can react to ("the column doesn'''t exist, let me check the schema").
+- **`json.dumps(..., default=str)`** handles `datetime`, `Decimal`, etc. that aren't JSON-native. Without this, dates raise `TypeError`.
+- **Error handling returns JSON.** The LLM reads the tool output as a string; an error in JSON form is something it can react to ("the column doesn't exist, let me check the schema").
 
 After this cell runs, `tool_run_sql` is in the `TOOLS` registry and a row in the `toolbox` table.
 
-## The Toolset (Pre-Built)
+## The notebook toolset
 
-The notebook registers these tools beyond `tool_run_sql`:
+The canonical notebook registers a deliberately small set:
 
 | Tool | What it does |
 |---|---|
-| `scan_database(owner)` | Run the §2 scanner against a schema; append facts to OAMP. |
-| `search_knowledge(query, k, kinds)` | Semantic search over the agent'''s long-term memory. |
-| `exec_js(code)` | Run JavaScript inside Oracle MLE — deterministic compute the LLM shouldn'''t do in its head. |
-| `scratch_write(path, content)` / `scratch_read(path)` / `scratch_append(path, content)` | DBFS scratchpad I/O. |
-| `remember(subject, body, kind)` | Persist a correction or learning into memory. |
-| `load_skill(name)` / `list_skills(query)` | Read a prose playbook from the skillbox. |
+| `scan_database(owner)` | Scan Oracle catalog views and persist schema facts to OAMP. |
+| `search_knowledge(query, k, kinds)` | Retrieve relevant long-term memories by meaning. |
+| `tool_run_sql(sql, max_rows)` | Execute bounded, read-only `SELECT`/`WITH` statements. |
+| `remember(subject, body, kind)` | Persist a correction or other durable fact. |
 
-You'''ll see the agent dispatch most of these in §5'''s end-to-end demo.
+The AppBook's registry is a separate application layer. It adds live probes for scratch storage, retrieval, memory, semantic grounding, skills, automations, and Mission Control; it is not an extra set of notebook TODOs.
 
 ## Skills: Procedural Memory for *How* to Do Things
 
-The §10 toolbox answers *"what can the agent call?"* — function specs, dispatched as `tool_calls`. The **`skillbox`** answers a different question: *"what does the agent know how to do?"* — prose playbooks the model reads as part of its context.
+The toolbox answers *"what can the agent call?"* — function specs, dispatched as `tool_calls`. The **`skillbox`** answers a different question: *"what does the agent know how to do?"* — prose playbooks the model reads as part of its context.
 
 Two procedural-memory tables, parallel structures:
 
@@ -149,14 +147,14 @@ The model sees the menu without paying for the meal.
 ## Key Takeaways — Part 6
 
 - **Tools are Python callables with embeddings.** The `@register` decorator introspects the function and writes a vector-indexed row. Function name + docstring + arg names *are* the public spec.
-- **Vector retrieval keeps the prompt lean.** With 30+ tools, including all of them every turn confuses the model. Top-k by cosine over the user query exposes only what'''s relevant — registry size grows without per-turn cost growing.
+- **Vector retrieval keeps the prompt lean.** With 30+ tools, including all of them every turn confuses the model. Top-k by cosine over the user query exposes only what's relevant — registry size grows without per-turn cost growing.
 - **Always-on vs retrieved.** Cheap-and-frequent tools (`run_sql`, `search_knowledge`, `remember`, `load_skill`) ship in every prompt. Specialised tools come from the toolbox lookup.
 - **Tools answer "what can I call?". Skills answer "what do I know how to do?".** Tools are dispatched as function calls; skills are prose playbooks the model reads.
 
 ## Troubleshooting
 
-**`ValueError: tool '"'"'tool_run_sql'"'"' has no docstring`** — The `_build_schema` helper requires a docstring. Add one.
+**`ValueError: tool 'tool_run_sql' has no docstring`** — The `_build_schema` helper requires a docstring. Add one.
 
-**`@register` raises `ORA-51962`** — The HNSW vector index couldn'''t be created. Check `vector_memory_size` and bounce the DB if needed (see [Part 1](part-1-setup.md)).
+**`@register` raises `ORA-51962`** — The HNSW vector index couldn't be created. Check `vector_memory_size` and bounce the DB if needed (see [Part 1](part-1-setup.md)).
 
 **`@register` succeeds but `retrieve_tools` returns empty results** — Run the cell that registers tools first. Without rows in `toolbox`, vector search has nothing to retrieve.

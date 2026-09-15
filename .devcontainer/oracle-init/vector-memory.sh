@@ -8,10 +8,10 @@
 # why the previous .sql hook left the pool at 0 and the very first index build blew up.)
 #
 # gvenzl/oracle-free runs files in /container-entrypoint-startdb.d/ as the oracle user (with
-# ORACLE_SID/ORACLE_HOME set) on EVERY start, so this self-heals existing data volumes too. It is
-# conditional and idempotent: it only sets the parameter + bounces the instance when the pool is not
-# yet allocated, so steady-state starts are a no-op (no restart loop). Mounted executable, so gvenzl
-# runs it as a subprocess rather than sourcing it.
+# ORACLE_SID/ORACLE_HOME set); the official 26ai Free image runs /opt/oracle/scripts/startup/*.sh
+# on every start (mounted there by docker-compose.yml). Either way this self-heals existing data
+# volumes: it is conditional and idempotent — it only sets the parameter + bounces the instance when
+# the pool is not yet allocated, so steady-state starts are a no-op (no restart loop).
 #
 # Idempotency check uses V$VECTOR_MEMORY_POOL.ALLOC_BYTES, NOT the parameter: on the Free image
 # SHOW PARAMETER / v$parameter reports VECTOR_MEMORY_SIZE as 0 even after the pool is allocated

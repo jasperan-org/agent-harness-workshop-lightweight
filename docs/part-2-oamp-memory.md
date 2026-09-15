@@ -14,11 +14,11 @@ Instead of hand-rolling a `knowledge` / `conversation` / `tool_log` schema, we h
 | `thread` (via `client.create_thread`) | A conversation. Holds messages and exposes a context card. | `conversation` |
 | `context_card` (via `thread.get_context_card`) | Compact, query-relevant block of memories + recent turns. | The hand-rolled `build_context` |
 
-We **do** keep one bespoke table — `scan_history`. It records *that* a scan ran, not *what was learned*. It'''s **procedural** memory of the agent'''s own actions, queried by time/owner not by meaning, so we put it in a regular indexed table rather than OAMP.
+The scanner records its `scan_id` in OAMP metadata so a later run can identify the source of each fact. The content hash, rather than a separate history table, is what makes unchanged facts cheap to skip.
 
 ## How OAMP Is Wired Up
 
-The pre-built setup cell wires OAMP with three things you'''ll see referenced in the Python code:
+The pre-built setup cell wires OAMP with three things you'll see referenced in the Python code:
 
 ```python
 memory_client = OracleAgentMemory(
@@ -45,7 +45,7 @@ Every memory record OAMP stores carries a `user_id` (the operator) and an `agent
 
 ## The Schema Scanner: Catalog Views as Training Data
 
-Tables are storage. **Retrieval** is what makes them useful. The agent'''s "enterprise awareness" comes from a scanner that reads Oracle'''s catalog views and converts each fact into a natural-language entry that goes into OAMP, embedded and ready for semantic retrieval.
+Tables are storage. **Retrieval** is what makes them useful. The agent's "enterprise awareness" comes from a scanner that reads Oracle's catalog views and converts each fact into a natural-language entry that goes into OAMP, embedded and ready for semantic retrieval.
 
 We mine **four** sources:
 
@@ -54,7 +54,7 @@ We mine **four** sources:
 3. **Relational** — `ALL_CONSTRAINTS`, `ALL_CONS_COLUMNS`: PK/FK. *How tables relate.*
 4. **Workload** — `V$SQL`: a sample of recent queries. *How the database is actually used.*
 
-> **Why store scanned facts as *text* with embeddings, not as normalized rows?** Because the agent retrieves by *meaning*, not by primary key. When the user asks "which table has the voyage manifest?" we want a cosine search over embedded descriptions to surface `SUPPLYCHAIN.CONTAINERS`, not a JOIN through four catalog views.
+> **Why store scanned facts as *text* with embeddings, not as normalized rows?** Because the agent retrieves by *meaning*, not by primary key. When the user asks "which table stores the orders?" we want a cosine search over embedded descriptions to surface `AGENT.ORDERS`, not a JOIN through several catalog views.
 
 Each scanner helper takes `(conn, owner)` and returns a `list[Fact]`:
 
@@ -62,14 +62,14 @@ Each scanner helper takes `(conn, owner)` and returns a `list[Fact]`:
 @dataclass
 class Fact:
     kind: str        # "table" | "column" | "relationship" | "query_pattern"
-    subject: str     # e.g. "SUPPLYCHAIN.VESSELS"
+    subject: str     # e.g. "AGENT.ORDERS"
     body: str        # natural-language sentence the embedder will read
     metadata: dict   # owner, table, column, etc.
 ```
 
 ## TODO 1: Implement `_scan_tables`
 
-This is the simplest of the four scanners — and it'''s the right place to learn the pattern. It mines `ALL_TABLES` joined with `ALL_TAB_COMMENTS` and emits one `Fact(kind="table")` per table.
+This is the simplest of the four scanners — and it's the right place to learn the pattern. It mines `ALL_TABLES` joined with `ALL_TAB_COMMENTS` and emits one `Fact(kind="table")` per table.
 
 **The query you need to run:**
 
@@ -84,9 +84,9 @@ SELECT t.table_name, tc.comments, t.num_rows, t.last_analyzed
 
 **For each row**, build a natural-language `body` that the embedder can index:
 
-> `"Table SUPPLYCHAIN.VESSELS. Documented purpose: Individual ships owned/operated by carriers. Approximate row count: 30. Statistics last gathered at 2026-05-09 12:34:00."`
+> `"Table AGENT.ORDERS. Documented purpose: One row per customer order. Approximate row count: 400."`
 
-Concatenate the parts conditionally — skip the comment line if there'''s no comment, skip the row count if `num_rows` is `None`, etc.
+Concatenate the parts conditionally — skip the comment line if there's no comment, skip the row count if `num_rows` is `None`, etc.
 
 **Solution:**
 
@@ -141,15 +141,15 @@ The hash check is what makes hourly re-scans free. The vast majority of calls ha
 
 ## Key Takeaways — Part 2
 
-- **Don'''t hand-roll the memory schema.** OAMP gives you `memory`, `thread`, and `context_card`. Skipping it costs weeks of bookkeeping code that has nothing to do with the agent'''s actual job.
+- **Don't hand-roll the memory schema.** OAMP gives you `memory`, `thread`, and `context_card`. Skipping it costs weeks of bookkeeping code that has nothing to do with the agent's actual job.
 - **Catalog views are training data.** `ALL_TABLES + ALL_TAB_COLUMNS + ALL_CONSTRAINTS + V$SQL` mined into prose facts is how you teach an agent your schema without fine-tuning a model.
 - **`body_hash` makes re-scans free.** The scanner only re-embeds facts whose underlying text changed. Hourly re-scans become viable when the dedup is content-based, not time-based.
-- **Procedural memory is different.** `scan_history` (when/how the agent ran) is queried by time and owner, not by meaning — keep it as a regular indexed table, not an OAMP memory.
+- **Metadata keeps the scan explainable.** Each fact carries a `scan_id`, and `body_hash` makes unchanged facts cheap to skip on a later scan.
 
 ## Troubleshooting
 
 **`ValueError: user already exists`** — OAMP's `add_user` and `add_agent` reject duplicate IDs. The pre-built `memory_client` initialisation in §2.2 wraps these calls in `try/except ValueError`, but if you call them yourself, do the same.
 
-**`ORA-00942: table or view does not exist`** — `ALL_TABLES` etc. are catalog views every user can read. If you see this, you'''re probably querying as a user without `SELECT_CATALOG_ROLE` (the setup cell granted it).
+**`ORA-00942: table or view does not exist`** — `ALL_TABLES` etc. are catalog views every user can read. If you see this, you're probably querying as a user without `SELECT_CATALOG_ROLE` (the setup cell granted it).
 
 **Scanner returns 0 facts** — Check the `owner` argument is the schema name in uppercase. `ALL_TABLES.owner` is always uppercase even if you `CREATE USER demo`.

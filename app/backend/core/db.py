@@ -10,9 +10,11 @@ helpers. All embeddings are produced in-database by the loaded ONNX model.
 from __future__ import annotations
 
 import json
+import re
 import threading
 
 import oracledb
+from langchain_core.embeddings import Embeddings
 
 from backend.config import settings
 
@@ -32,6 +34,9 @@ _store = None
 _vs_conn = None
 _kw_retriever = None
 _vs_lock = threading.Lock()
+# Oracle Text availability: None = untested, False = CONTAINS/CTXSYS missing on this image
+# (community *-slim images ship no Oracle Text), so keyword search uses a SQL fallback.
+_text_search_ok: bool | None = None
 
 
 # ── pool + helpers ────────────────────────────────────────────────────────
@@ -84,19 +89,63 @@ def status() -> dict:
     return dict(_state)
 
 
+def _reset_runtime_state():
+    """Drop partially-built vector-store state so a later warm-up can retry cleanly."""
+    global _store, _vs_conn, _kw_retriever
+    _store = None
+    _kw_retriever = None
+    if _vs_conn is not None:
+        try:
+            _vs_conn.close()
+        except Exception:
+            pass
+    _vs_conn = None
+
+
 # ── the OracleVS vector store (matches the refactored notebook) ────────────
+class _InDBEmbeddings(Embeddings):
+    """Embed through the in-database ONNX model via the SQL function VECTOR_EMBEDDING(...).
+
+    langchain_oracledb's provider="database" builds OracleEmbeddings on top of
+    DBMS_VECTOR_CHAIN.UTL_TO_EMBEDDINGS, which slim community images do not ship
+    (ORA-00904 invalid identifier) — that failure aborted initialize() before the schema,
+    catalog and registries were ever built. The SQL function needs only the loaded model,
+    so this keeps the whole store working on 23ai and 26ai alike.
+    """
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def _embed(self, texts) -> list[list[float]]:
+        cur = self._conn.cursor()
+        try:
+            out = []
+            for text in texts:
+                cur.execute(f"SELECT VECTOR_EMBEDDING({EMB} USING :t AS DATA) v FROM dual", {"t": text})
+                row = cur.fetchone()
+                out.append([float(x) for x in row[0]] if row and row[0] is not None else [])
+            return out
+        finally:
+            cur.close()
+
+    def embed_documents(self, texts) -> list[list[float]]:
+        return self._embed(texts)
+
+    def embed_query(self, text) -> list[float]:
+        return self._embed([text])[0]
+
+
 def _build_store():
     """Create the OracleVS store + in-database embeddings + keyword retriever, and
     ensure the AGENT_VSTORE table and its HNSW + text indexes exist."""
     global _store, _vs_conn, _kw_retriever
     if _store is not None:
         return _store
-    from langchain_oracledb.embeddings import OracleEmbeddings
     from langchain_oracledb.vectorstores import OracleVS, DistanceStrategy, oraclevs
     from langchain_oracledb.retrievers.text_search import OracleTextSearchRetriever, create_text_index
 
     _vs_conn = oracledb.connect(user=settings.ora_user, password=settings.ora_password, dsn=settings.ora_dsn)
-    emb = OracleEmbeddings(conn=_vs_conn, params={"provider": "database", "model": EMB})
+    emb = _InDBEmbeddings(_vs_conn)
     _store = OracleVS(client=_vs_conn, embedding_function=emb, table_name=VSTORE,
                       distance_strategy=DistanceStrategy.COSINE)
 
@@ -115,16 +164,27 @@ def _build_store():
         pass
     try:
         create_text_index(_vs_conn, idx_name="AGENT_VSTORE_TEXT", vector_store=_store)
+        _mark_text_search(True)
     except Exception as e:
-        if "ORA-00955" not in str(e):
-            pass
+        # Not fatal: images without Oracle Text (no CTXSYS, no CONTAINS operator) cannot build
+        # this index. Record it so kw_search() takes the substring fallback instead of returning
+        # an opaque ORA-00904 to every keyword/hybrid retrieval request.
+        _mark_text_search(False)
+        print(f"[db] Oracle Text unavailable ({str(e).splitlines()[0][:90]}) "
+              "— keyword search will use substring matching.")
     try:
         x(f"DELETE FROM {VSTORE} WHERE JSON_VALUE(metadata,'$.namespace')='__bootstrap'")
     except Exception:
         pass
 
-    _kw_retriever = OracleTextSearchRetriever(vector_store=_store, k=30, fuzzy=True, return_scores=True)
+    if _text_search_ok:
+        _kw_retriever = OracleTextSearchRetriever(vector_store=_store, k=30, fuzzy=True, return_scores=True)
     return _store
+
+
+def _mark_text_search(ok: bool):
+    global _text_search_ok
+    _text_search_ok = ok
 
 
 def _row(doc, score):
@@ -153,6 +213,7 @@ def initialize():
             _state["error"] = None
         except Exception as e:  # surface but keep serving the frontend
             _state["error"] = str(e).splitlines()[0]
+            _reset_runtime_state()
             raise
 
 
@@ -255,12 +316,49 @@ def embedding_preview(text: str, n: int = 8):
 
 # ── retrieval ladder (read path) — via the library retrievers ─────────────
 def kw_search(query, namespace="knowledge", k=5):
-    with _vs_lock:
-        _build_store()
-        docs = _kw_retriever.invoke(query or "")
-    if namespace:
-        docs = [d for d in docs if d.metadata.get("namespace") == namespace]
-    return [_row(d, d.metadata.get("score")) for d in docs[:k]]
+    """Keyword rung of the retrieval ladder.
+
+    Uses Oracle Text (CONTAINS) when the image ships it; otherwise scores rows by how many query
+    terms the content contains. Without the fallback, an image without Oracle Text answers every
+    keyword and hybrid request with ORA-00904: "CONTAINS": invalid identifier.
+    """
+    global _text_search_ok
+    if _text_search_ok is not False:
+        try:
+            with _vs_lock:
+                _build_store()
+                docs = _kw_retriever.invoke(query or "")
+            _mark_text_search(True)
+            if namespace:
+                docs = [d for d in docs if d.metadata.get("namespace") == namespace]
+            return [_row(d, d.metadata.get("score")) for d in docs[:k]]
+        except Exception as e:
+            message = str(e)
+            if not any(tok in message for tok in ("ORA-00904", "ORA-29902", "ORA-29955", "DRG-")):
+                raise
+            _mark_text_search(False)
+            print(f"[db] Oracle Text keyword search unavailable ({message.splitlines()[0][:90]}) "
+                  "— using substring fallback.")
+    return _substring_search(query, namespace, k)
+
+
+def _substring_search(query, namespace="knowledge", k=5):
+    """Keyword fallback with no Oracle Text dependency: rank rows by matched query terms.
+
+    OracleVS stores the document body in the ``text`` column (the rest of the app sees it as
+    CONTENT via _row()).
+    """
+    tokens = [t for t in re.split(r"\W+", (query or "").lower()) if len(t) > 2][:8]
+    if not tokens:
+        return []
+    score = " + ".join(f"CASE WHEN LOWER(text) LIKE :t{i} THEN 1 ELSE 0 END" for i in range(len(tokens)))
+    params = {f"t{i}": f"%{t}%" for i, t in enumerate(tokens)}
+    params.update({"ns": namespace, "k": k})
+    rows = q(f"""SELECT id, text, metadata, ({score}) AS hits FROM {VSTORE}
+              WHERE JSON_VALUE(metadata,'$.namespace') = :ns
+              ORDER BY hits DESC FETCH FIRST :k ROWS ONLY""", params)
+    return [{"ID": r["ID"], "CONTENT": r["TEXT"], "metadata": r["METADATA"], "score": r["HITS"]}
+            for r in rows if r["HITS"]]
 
 
 def vec_search(query, namespace="knowledge", k=5):

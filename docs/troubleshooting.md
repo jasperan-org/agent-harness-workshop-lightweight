@@ -1,3 +1,5 @@
+> **Canonical lightweight path:** use the included compose service, run `python scripts/seed_oracle.py` once, start the AppBook with `bash .devcontainer/start-app.sh`, and open port 8000. The old supply-chain/MLE commands below apply only to the advanced reference notebook.
+
 # Troubleshooting Guide
 
 This guide covers the most common issues encountered during the Enterprise Data Agent Workshop and how to resolve them.
@@ -26,7 +28,7 @@ conn.commit(); conn.close()
 Then bounce the database:
 
 ```bash
-docker restart oracle-free
+docker compose -f .devcontainer/docker-compose.yml restart oracle
 ```
 
 Wait ~60 seconds for FREEPDB1 to report `READ WRITE`, restart the Jupyter kernel, and re-run from §1.
@@ -37,12 +39,12 @@ Wait ~60 seconds for FREEPDB1 to report `READ WRITE`, restart the Jupyter kernel
 
 **Symptom:** `DBMS_VECTOR.RERANK` falls back to plain cosine ordering with `ORA-04036`.
 
-**Cause:** The Free image ships with `pga_aggregate_limit = 2G`, which is too tight for the reranker'''s transient PGA use.
+**Cause:** The Free image ships with `pga_aggregate_limit = 2G`, which is too tight for the reranker's transient PGA use.
 
-**Fix:** Raise it at the CDB level (PDBs can'''t change this parameter):
+**Fix:** Raise it at the CDB level (PDBs can't change this parameter):
 
 ```bash
-docker exec -i oracle-free sqlplus -s / as sysdba <<'''SQL'''
+docker compose -f .devcontainer/docker-compose.yml exec -T oracle sqlplus -s / as sysdba <<'SQL'
 ALTER SESSION SET CONTAINER = CDB$ROOT;
 ALTER SYSTEM SET pga_aggregate_limit = 4G SCOPE=BOTH;
 EXIT
@@ -57,7 +59,7 @@ SQL
 
 **Symptom:** Any database connection attempt fails with `Connection refused` or `DPY-6005`.
 
-**Cause:** The Oracle container isn'''t running.
+**Cause:** The Oracle container isn't running.
 
 **Fix:**
 
@@ -65,10 +67,10 @@ SQL
 docker ps
 ```
 
-If `oracle-free` isn'''t listed, start it (the §1 setup cell does this on first run):
+If the compose-managed Oracle service isn't listed, start it:
 
 ```bash
-docker start oracle-free
+docker compose -f .devcontainer/docker-compose.yml up -d oracle
 ```
 
 Wait 30 seconds and retry the connection cell.
@@ -79,31 +81,31 @@ Wait 30 seconds and retry the connection cell.
 
 **Symptom:** Connecting as `AGENT` fails with an authentication error.
 
-**Cause:** The §1 bootstrap cell didn'''t run — `AGENT` doesn'''t exist yet. Or the container was rebuilt with a stale volume.
+**Cause:** `scripts/seed_oracle.py` did not complete, or the container was rebuilt with a stale volume.
 
-**Fix:** Re-run the bootstrap cell (it creates `AGENT` if missing). If the issue persists:
+**Fix:** Re-run the idempotent bootstrap from the repository root:
 
 ```bash
-docker exec oracle-free resetPassword OraclePwd_2025
+python scripts/seed_oracle.py
 ```
 
-Then re-run the bootstrap cell.
+If the admin password itself is wrong, update `ORA_ADMIN_PWD` to match the compose file or your external Oracle instance before rerunning.
 
 ---
 
 ### Oracle container starts but never becomes ready
 
-**Symptom:** `docker ps` shows `oracle-free` running, but the connection cell still fails.
+**Symptom:** `docker ps` shows the Oracle service running, but the connection cell still fails.
 
-**Cause:** Oracle'''s listener takes a few seconds longer than the container healthcheck signals.
+**Cause:** Oracle's listener takes a few seconds longer than the container healthcheck signals.
 
 **Fix:** Check the logs:
 
 ```bash
-docker logs oracle-free 2>&1 | tail -20
+docker compose -f .devcontainer/docker-compose.yml logs --tail=20 oracle
 ```
 
-If you see `DATABASE IS READY TO USE!`, Oracle is up. The pre-built `connect()` helper retries automatically; if it'''s still failing after 5 attempts, restart the kernel and try again.
+If you see `DATABASE IS READY TO USE!`, Oracle is up. The pre-built `connect()` helper retries automatically; if it's still failing after 5 attempts, restart the kernel and try again.
 
 ---
 
@@ -118,7 +120,7 @@ If you see `DATABASE IS READY TO USE!`, Oracle is up. The pre-built `connect()` 
 **Fix:** This is expected. Do not refresh. Wait for the terminal prompt. If it exceeds 10 minutes:
 
 ```bash
-docker logs oracle-free 2>&1 | tail -20
+docker compose -f .devcontainer/docker-compose.yml logs --tail=20 oracle
 ```
 
 ---
@@ -127,7 +129,7 @@ docker logs oracle-free 2>&1 | tail -20
 
 **Symptom:** A cell fails because `os.environ.get(...)` returns `None`.
 
-**Cause:** The Codespaces secret was added after this Codespace was created, so it wasn'''t injected at startup. (Secrets are only injected at creation time.)
+**Cause:** The Codespaces secret was added after this Codespace was created, so it wasn't injected at startup. (Secrets are only injected at creation time.)
 
 **Fix:** Set the key manually for this session only:
 
@@ -143,7 +145,7 @@ Do not commit this to git. For permanent fixes, stop the Codespace, add the secr
 
 ### Jupyter kernel "Python 3.11" not found
 
-**Symptom:** The notebook asks you to select a kernel and Python 3.11 isn'''t listed.
+**Symptom:** The notebook asks you to select a kernel and Python 3.11 isn't listed.
 
 **Fix:**
 
@@ -154,6 +156,58 @@ pip install -q ipykernel && python -m ipykernel install --user --name python3 --
 Reload the VS Code window (`Cmd/Ctrl + Shift + P` → `Developer: Reload Window`) and select the kernel again.
 
 ---
+
+## App returns HTTP 500 / 502
+
+Start with the app's own harness status — it reports the first line of any startup failure:
+
+```bash
+curl -s localhost:8000/api/health | python -m json.tool
+# {"model": "xai.grok-4.20-non-reasoning", "api_key_set": true,
+#  "harness": {"ready": true, "oracle": true, "rerank": false, "error": null}}
+```
+
+`harness.ready` only turns true after the schema, semantic catalog and registries are built.
+While it is false the status badge says "warming…" and the semantic / retrieval / agent routes fail.
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| 500 on retrieval, semantic, skills; `harness.error` mentions `DBMS_VECTOR_CHAIN.UTL_TO_EMBEDDINGS` | The vector store was embedding through `DBMS_VECTOR_CHAIN`, which slim images omit, so `initialize()` died before seeding anything | Fixed: `db.py` embeds via the SQL `VECTOR_EMBEDDING(...)` function. Restart the app. |
+| `ORA-04042` during setup, then no `ALL_MINILM_L12_V2` in the DB | An unavailable package grant aborted `seed_oracle.py` before the ONNX loader ran | Re-run `python scripts/seed_oracle.py` (the grant is now optional and it reports what it skipped). |
+| Agent loop / chat: `404 ... Entity with key xai.grok-4-1-fast-reasoning not found` | Retired model id | Set `LLM_MODEL` in `app/.env` to a live id — `xai.grok-4.20-non-reasoning` (default) — and restart. |
+| Chat shows `Chat request failed: cannot use a decompressobj multiple times` | OCI returns the SSE stream `content-encoding: zstd`, which httpx's streaming decoder cannot consume | Fixed: the OpenAI clients send `Accept-Encoding: identity` (`llm_client.py`). Restart the app. |
+| Memory routes 500 with `'_InDBOnnxEmbedder' object has no attribute 'embedding_dimension'` | OAMP's embedder must subclass `IEmbedder` so it can infer the dimension | Fixed in `memory.py` (mirrors the notebook's `OracleONNXEmbedder`). Restart the app. |
+| Keyword or hybrid retrieval 500s: `ORA-00904: "CONTAINS": invalid identifier` | The image has no Oracle Text (no `CTXSYS` / `CONTAINS`) | Use the 26ai image from `docker-compose.yml`; `db.py` also falls back to substring matching. |
+| 502 from the forwarded URL with nothing in the request log | The app process died or never bound port 8000 | `tail -n 50 /tmp/total-recall-app.log`, then restart (below). |
+
+Restart the appbook in a Codespace (it auto-starts from `app/.env`):
+
+```bash
+pkill -f "uvicorn backend.main:app" ; bash .devcontainer/start-app.sh
+```
+
+`app/.env` is regenerated from the container environment on every start by
+`scripts/write_app_env.sh`, so change `LLM_MODEL` in `.devcontainer/docker-compose.yml` (or restart
+the Codespace) for a change to stick.
+
+### Restarting, rebuilding, or creating a new Codespace
+
+The Oracle database lives in a **named volume**, so it survives container restarts. Because the
+image changed to 26ai Free, a volume created by the previous image must be recreated **once**:
+
+```bash
+docker compose -f .devcontainer/docker-compose.yml down -v   # then rebuild/restart the container
+```
+
+The workshop's own demo data reseeds itself; skills, workflows and automations you created in that
+volume are lost with it. `postCreate.sh` provisions the database (AGENT schema + in-database ONNX
+embedder) and `start-app.sh` re-checks and re-provisions it on **every** start, so an empty or
+partially-built volume self-heals instead of leaving the app stuck on "warming…".
+
+A brand-new Codespace needs nothing extra: `postCreate` installs the app dependencies, downloads
+the embedder (127 MB) and provisions the schema, then `start-app.sh` starts the appbook — which is
+why the port-8000 preview opens on its own. Set `OCI_GENAI_API_KEY` as a Codespaces secret *before*
+creating it; without one the appbook still serves, but chat and the agent loop stay disabled.
 
 ## OAMP / Memory Issues
 
@@ -171,17 +225,17 @@ Reload the VS Code window (`Cmd/Ctrl + Shift + P` → `Developer: Reload Window`
 
 **Symptom:** `run_scan(agent_conn, owner=DEMO_USER)` reports `facts_total = 0`.
 
-**Cause:** The `owner` argument is case-sensitive at the SQL layer (`ALL_TABLES.owner` is always uppercase). Or the SUPPLYCHAIN seed cell didn'''t complete.
+**Cause:** The `owner` argument is case-sensitive at the SQL layer (`ALL_TABLES.owner` is always uppercase). Or the AppBook startup did not complete the retail seed.
 
 **Fix:** Confirm the user exists and has tables:
 
 ```python
-with sys_conn.cursor() as cur:
-    cur.execute("SELECT COUNT(*) FROM all_tables WHERE owner = '"'"'SUPPLYCHAIN'"'"'")
+with agent_conn.cursor() as cur:
+    cur.execute("SELECT COUNT(*) FROM all_tables WHERE owner = 'AGENT'")
     print("table count:", cur.fetchone()[0])
 ```
 
-Should print `7`. If `0`, re-run the seed cell.
+It should be greater than zero and include the retail tables. If `0`, run `cd app && ./run.sh` and wait for `harness.ready` to become true.
 
 ---
 
@@ -189,7 +243,7 @@ Should print `7`. If `0`, re-run the seed cell.
 
 **Symptom:** Calling `retrieve_knowledge` after a successful scan returns an empty list.
 
-**Cause:** The ONNX embedder didn'''t register, or the `kinds=` filter is too restrictive.
+**Cause:** The ONNX embedder didn't register, or the `kinds=` filter is too restrictive.
 
 **Fix:** Check the embedder is loaded:
 
@@ -199,7 +253,7 @@ with agent_conn.cursor() as cur:
     print(list(cur))
 ```
 
-Should include `ALL_MINILM_L12_V2`. If empty, the §1 ONNX load cell didn'''t run.
+Should include `ALL_MINILM_L12_V2`. If empty, run `python scripts/seed_oracle.py` and wait for the model load to complete.
 
 For `kinds=`, try without a filter first to confirm there are memories at all:
 
@@ -215,7 +269,7 @@ retrieve_knowledge("table", k=5)  # no kinds filter
 
 **Symptom:** `@register` raises this error.
 
-**Cause:** The `_build_schema` helper requires a non-empty docstring — it'''s the tool'''s public spec, embedded for retrieval.
+**Cause:** The `_build_schema` helper requires a non-empty docstring — it's the tool's public spec, embedded for retrieval.
 
 **Fix:** Add a docstring describing what the tool does and *when* to call it. "Use this when..." is good phrasing.
 
@@ -225,7 +279,7 @@ retrieve_knowledge("table", k=5)  # no kinds filter
 
 **Symptom:** The agent loop raises this on the second LLM call.
 
-**Cause:** You appended a `tool` message to `messages` without first appending the assistant'''s `tool_calls` message.
+**Cause:** You appended a `tool` message to `messages` without first appending the assistant's `tool_calls` message.
 
 **Fix:** Make sure the loop body is in this order:
 
@@ -250,7 +304,7 @@ See [Part 7 guide](part-7-agent-loop.md) for the exact pattern.
 
 ## Checking System Status
 
-If something isn'''t working and you'''re not sure where, run this diagnostic cell:
+If something isn't working and you're not sure where, run this diagnostic cell:
 
 ```python
 import oracledb, os
@@ -258,19 +312,19 @@ import oracledb, os
 print("=== Environment ===")
 for k in ("OPENAI_API_KEY", "OCI_GENAI_API_KEY", "LLM_PROVIDER", "LLM_MODEL"):
     v = os.environ.get(k)
-    print(f"  {k}: {'"'"'SET'"'"' if v else '"'"'NOT SET'"'"'}")
+    print(f"  {k}: {'SET' if v else 'NOT SET'}")
 
 print("\n=== Oracle Connection ===")
 try:
-    conn = oracledb.connect(user="AGENT", password="AgentPwd_2025",
+    conn = oracledb.connect(user="AGENT", password="AgentPw_2026",
                             dsn="localhost:1521/FREEPDB1")
     cur = conn.cursor()
     cur.execute("SELECT BANNER FROM v$version WHERE rownum = 1")
     print("  AGENT user:", cur.fetchone()[0])
     cur.execute("SELECT model_name FROM user_mining_models")
     print("  ONNX models:", [r[0] for r in cur])
-    cur.execute("SELECT COUNT(*) FROM all_tables WHERE owner = '"'"'SUPPLYCHAIN'"'"'")
-    print("  SUPPLYCHAIN tables:", cur.fetchone()[0])
+    cur.execute("SELECT COUNT(*) FROM all_tables WHERE owner = 'AGENT'")
+    print("  AGENT tables:", cur.fetchone()[0])
     conn.close()
 except Exception as e:
     print("  AGENT connection: FAILED:", e)
@@ -281,7 +335,7 @@ try:
                             dsn="localhost:1521/FREEPDB1",
                             mode=oracledb.AUTH_MODE_SYSDBA)
     cur = conn.cursor()
-    cur.execute("SELECT value FROM v$parameter WHERE name = '"'"'vector_memory_size'"'"'")
+    cur.execute("SELECT value FROM v$parameter WHERE name = 'vector_memory_size'")
     val = int(cur.fetchone()[0] or 0)
     print(f"  vector_memory_size: {val // (1024**2)}M" if val > 0 else "  vector_memory_size: 0 (HNSW will fail)")
     conn.close()
