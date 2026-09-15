@@ -79,17 +79,33 @@ Wait 30 seconds and retry the connection cell.
 
 ### ORA-01017: Invalid username or password
 
-**Symptom:** Connecting as `AGENT` fails with an authentication error.
+**Symptom:** Connecting as `AGENT` fails — from the notebook (`could not connect to oracle:1521/FREEPDB1`), from the appbook (`harness.ready: false`), or from `sqlplus`. Related: `ORA-28000: The account is locked`.
 
-**Cause:** `scripts/seed_oracle.py` did not complete, or the container was rebuilt with a stale volume.
+**Cause:** the database lives in a named volume that outlives the container, so its `AGENT` user can hold a password the current environment doesn't use — a volume seeded by an older Codespace, an `ORA_AGENT_PWD` that changed, or an account **locked** by repeated failed logins (the notebook and the lifecycle probe both retry, so ten bad attempts happen easily).
 
-**Fix:** Re-run the idempotent bootstrap from the repository root:
+**Fix:** re-run the bootstrap. It is idempotent and now *converges* the credential — it alters the password and unlocks the account, rather than only creating the user when absent:
 
 ```bash
-python scripts/seed_oracle.py
+python scripts/seed_oracle.py        # or:  bash .devcontainer/start-app.sh
 ```
 
-If the admin password itself is wrong, update `ORA_ADMIN_PWD` to match the compose file or your external Oracle instance before rerunning.
+Then re-run the notebook's connection cell (its `connect()` no longer retries a rejected password — retrying only burns `FAILED_LOGIN_ATTEMPTS`).
+
+If you want to do it by hand as SYSDBA, inside the Oracle container:
+
+```bash
+C="$(docker ps --filter name=oracle --format '{{.Names}}' | head -1)"
+docker exec -i "$C" bash -lc "sqlplus -s -L / as sysdba" <<< \
+  'ALTER SESSION SET CONTAINER=FREEPDB1; ALTER USER AGENT IDENTIFIED BY "AgentPw_2026" ACCOUNT UNLOCK;'
+```
+
+**If the *admin* login is rejected too** — `✖ no admin credential worked` — the volume was initialised with a different `ORACLE_PWD` or by another image. No SQL can repair that; recreate the volume and let a fresh database initialise:
+
+```bash
+docker compose -f .devcontainer/docker-compose.yml down
+docker volume rm $(docker volume ls -q | grep oracle-data)
+# then: Codespaces → Rebuild Container   (or  docker compose up -d)
+```
 
 ---
 

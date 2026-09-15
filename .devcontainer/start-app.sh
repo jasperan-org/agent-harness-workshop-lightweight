@@ -28,7 +28,16 @@ try:
                 {"m": os.environ.get("EMBED_MODEL", "ALL_MINILM_L12_V2")})
     ready = cur.fetchone()[0] > 0
     conn.close()
-except Exception:
+except Exception as e:
+    # Say *why* the harness looks unprovisioned: a rejected login (a volume whose AGENT password
+    # drifted, or an account locked by failed logins) needs the seed's credential convergence, not
+    # just a model load — and it is the difference between "wait for it" and "fix it".
+    first = str(e).splitlines()[0]
+    if any(code in first for code in ("ORA-01017", "ORA-28000", "ORA-28001")):
+        print(f"  {os.environ.get('ORA_AGENT_USER', 'AGENT')} login rejected: {first}")
+        print("  → running the seed, which converges the password and unlocks the account")
+    else:
+        print(f"  harness not ready: {first}")
     ready = False
 sys.exit(0 if ready else 1)
 PY

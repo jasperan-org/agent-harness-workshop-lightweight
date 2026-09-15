@@ -84,6 +84,15 @@ _IGNORE = (
 AGENT_TABLESPACE = os.environ.get("ORA_AGENT_TABLESPACE", "USERS")
 
 
+# ORA-01017 wrong password, ORA-28000 account locked, ORA-28001 password expired.
+_CREDENTIAL_ERRORS = ("ORA-01017", "ORA-28000", "ORA-28001")
+
+
+def is_credential_error(exc) -> bool:
+    """True for errors that waiting can never fix — a bad password or a locked account."""
+    return any(code in str(exc) for code in _CREDENTIAL_ERRORS)
+
+
 def connect_with_retry(user, password, dsn, mode=None, attempts=60, base_delay=5.0):
     """Connect, retrying while the database warms up (it can take a minute on first boot)."""
     last = None
@@ -93,9 +102,49 @@ def connect_with_retry(user, password, dsn, mode=None, attempts=60, base_delay=5
             return oracledb.connect(user=user, password=password, dsn=dsn, **kw)
         except Exception as e:  # noqa: BLE001
             last = e
+            if is_credential_error(e):
+                # Retrying 60 times over five minutes only hides the real problem.
+                raise
             print(f"  …waiting for Oracle ({i}/{attempts}): {str(e).splitlines()[0]}")
             time.sleep(base_delay)
     raise SystemExit(f"Could not connect to Oracle at {dsn} as {user}: {last}")
+
+
+def connect_admin():
+    """Connect as SYSDBA, trying the documented admin credentials in turn.
+
+    A named volume keeps whatever SYS/SYSTEM password the image was initialised with, so a volume
+    created with a different ORACLE_PWD (or by a different image) rejects the configured one. Trying
+    the documented candidates beats failing with an opaque ORA-01017 the user cannot act on. Only
+    credential failures fall through — a database that is still warming up keeps retrying normally.
+    """
+    try:
+        return connect_with_retry(ADMIN_USER, ADMIN_PWD, DSN, mode=oracledb.AUTH_MODE_SYSDBA)
+    except Exception as e:  # noqa: BLE001
+        if not is_credential_error(e):
+            raise
+        first = e
+
+    passwords = list(dict.fromkeys([ADMIN_PWD, "OraclePwd_2025", "OraclePwd_2026"]))
+    for user, mode in (("SYS", oracledb.AUTH_MODE_SYSDBA), ("SYSTEM", None), ("PDBADMIN", None)):
+        for pwd in passwords:
+            try:
+                conn = connect_with_retry(user, pwd, DSN, mode=mode, attempts=1, base_delay=0)
+                print(f"  note: connected as {user} — the configured admin user {ADMIN_USER} was rejected")
+                return conn
+            except Exception as e:  # noqa: BLE001
+                if not is_credential_error(e):
+                    raise
+                continue
+
+    print(f"\n  ✖ no admin credential worked for {DSN}", file=sys.stderr)
+    print(f"    ({str(first).splitlines()[0]})", file=sys.stderr)
+    print("    The data volume was initialised with a different ORACLE_PWD, or by another image. No SQL\n"
+          "    can repair that — recreate the volume and let a fresh database initialise:", file=sys.stderr)
+    print("      docker compose -f .devcontainer/docker-compose.yml down", file=sys.stderr)
+    print("      docker volume rm $(docker volume ls -q | grep oracle-data)", file=sys.stderr)
+    print("      # then: Codespaces → Rebuild Container  (or  docker compose up -d)", file=sys.stderr)
+    raise SystemExit(1)
 
 
 def ddl_idempotent(conn, sql):
@@ -233,13 +282,20 @@ def main():
     print(f"▸ Provisioning Oracle at {DSN} (AGENT user + in-DB ONNX embedder)…")
 
     # 1) Create the AGENT user and apply the grants (as SYSDBA, in FREEPDB1).
-    admin = connect_with_retry(ADMIN_USER, ADMIN_PWD, DSN, mode=oracledb.AUTH_MODE_SYSDBA)
+    admin = connect_admin()
     print(f"  admin connected — DB version {admin.version}")
     ensure_agent_tablespace(admin)
     ddl_idempotent(
         admin,
         f'CREATE USER {AGENT} IDENTIFIED BY "{AGENT_PWD}" DEFAULT TABLESPACE {AGENT_TABLESPACE}',
     )
+    # Converge the login even when the user already exists — and unlock it. The database lives in a
+    # named volume that outlives the container, so a volume seeded with a different ORA_AGENT_PWD,
+    # or an AGENT account LOCKED by repeated failed logins (the notebook retries, so a stale
+    # password gets there quickly), would otherwise reject every AGENT connection forever no matter
+    # what docker-compose and app/.env say. Harmless when CREATE just made the user.
+    ddl_idempotent(admin, f'ALTER USER {AGENT} IDENTIFIED BY "{AGENT_PWD}" ACCOUNT UNLOCK')
+
     # Idempotent repair for schemas created before the tablespace was made explicit (e.g. an older
     # volume whose AGENT still defaults to SYSTEM). Without this, existing codespaces stay broken.
     ddl_idempotent(
@@ -259,7 +315,16 @@ def main():
 
     # 2) As AGENT, load the embedder so the model is owned by the AGENT schema (the appbook's
     #    VECTOR_EMBEDDING(ALL_MINILM_L12_V2 ...) calls resolve to a model in its own schema).
-    agent = connect_with_retry(AGENT, AGENT_PWD, DSN)
+    try:
+        agent = connect_with_retry(AGENT, AGENT_PWD, DSN)
+    except Exception as e:  # noqa: BLE001
+        print(f"\n  ✖ {AGENT} cannot log in with ORA_AGENT_PWD: {str(e).splitlines()[0]}")
+        print(f"    This volume's {AGENT} user does not match this environment. Repair it as SYSDBA:")
+        print('      C="$(docker ps --filter name=oracle --format {{.Names}} | head -1)"')
+        print(f'      docker exec -i "$C" bash -lc "sqlplus -s -L / as sysdba" <<< \\')
+        print(f"        'ALTER SESSION SET CONTAINER=FREEPDB1; ALTER USER {AGENT} IDENTIFIED BY "
+              f'\"{AGENT_PWD}\" ACCOUNT UNLOCK;\'\n')
+        raise
     print(f"  {AGENT} connected — loading the embedder")
     onnx_path = ensure_model_file(EMBED_ONNX_PATH, EMBED_ONNX_URL)
     load_onnx_model(
