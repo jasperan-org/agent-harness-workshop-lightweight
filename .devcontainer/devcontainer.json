@@ -13,6 +13,11 @@
     "8000": { "label": "Total Recall appbook", "onAutoForward": "openPreview" },
     "8888": { "label": "JupyterLab", "onAutoForward": "silent" }
   },
+  // Split on purpose: a Codespaces *prebuild* runs setup up to and including onCreateCommand and
+  // snapshots the result (postCreateCommand is not part of a prebuild). Slow work that needs no
+  // database — pip installs, the 127 MB ONNX embedder download — therefore belongs in onCreate, so
+  // enabling prebuilds makes new codespaces start in seconds. postCreate keeps the DB provisioning.
+  "onCreateCommand": "bash .devcontainer/onCreate.sh",
   "postCreateCommand": "bash .devcontainer/postCreate.sh",
   "postStartCommand": "bash .devcontainer/start-app.sh",
   // Forward the OCI GenAI secrets from the Codespaces environment into the env that lifecycle

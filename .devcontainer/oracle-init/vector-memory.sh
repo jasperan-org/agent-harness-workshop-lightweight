@@ -22,6 +22,12 @@
 
 POOL_MB=256
 
+# This hook runs inside the database container's startup sequence. If it exits non-zero, or leaves
+# the instance closed, the container ends up unhealthy — and a Codespace whose database never comes
+# up fails to start at all ("recovery mode: container error"). Tuning the vector pool must never be
+# able to take the database down, so every path below is best-effort and the script exits 0.
+command -v sqlplus >/dev/null 2>&1 || { echo "[vector-memory] sqlplus not found — skipping"; exit 0; }
+
 allocated=$(sqlplus -s -L / as sysdba <<'SQL' 2>/dev/null
 set heading off feedback off pagesize 0 verify off echo off termout on
 SELECT NVL(SUM(alloc_bytes), 0) FROM v$vector_memory_pool;
@@ -44,3 +50,24 @@ SQL
 else
   echo "[vector-memory] Pool already allocated (${allocated} bytes). No restart needed."
 fi
+
+# Safety net: if the bounce above left the instance closed, open it again. Without this, a failed
+# restart would leave the container unhealthy, which is precisely the state that stops a Codespace
+# from starting.
+state=$(sqlplus -s -L / as sysdba <<'SQL' 2>/dev/null
+set heading off feedback off pagesize 0
+SELECT 'DB=' || status FROM v$instance;
+exit
+SQL
+)
+if ! printf '%s' "$state" | grep -q 'DB=OPEN'; then
+  echo "[vector-memory] Instance not open (${state:-no answer}) — re-opening…"
+  sqlplus -s -L / as sysdba <<'SQL' 2>/dev/null || true
+whenever sqlerror continue
+startup;
+alter pluggable database all open;
+exit
+SQL
+fi
+
+exit 0

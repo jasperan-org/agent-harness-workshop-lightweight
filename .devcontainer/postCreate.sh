@@ -1,17 +1,8 @@
 #!/usr/bin/env bash
-# Runs once when the Codespace / dev container is created.
+# Runs once after the container is created (and after onCreate; a Codespaces *prebuild* stops at
+# onCreate, which is why the install steps live in .devcontainer/onCreate.sh instead of here).
+# Everything in this file needs a live database.
 set -euo pipefail
-
-echo "▸ Installing the appbook dependencies…"
-python -m pip install --upgrade pip
-python -m pip install -r app/requirements.txt
-
-echo "▸ Installing the notebook-only dependencies (agent loop, durable graph state, charts)…"
-# The appbook ships the runtime deps; the notebook additionally needs LangGraph + the Oracle
-# checkpointer, the chat-model bindings, and matplotlib for the context-engineering chart.
-python -m pip install jupyterlab ipykernel \
-  langgraph langgraph-oracledb langchain langchain-openai openai \
-  matplotlib pandas onnx nbconvert
 
 echo "▸ Writing app/.env so the appbook reads the same env the notebook uses…"
 # The appbook is auto-started by a non-interactive lifecycle hook that doesn't reliably inherit the

@@ -7,10 +7,15 @@
 # The database persists across restarts via a named volume.
 services:
   oracle:
-    # Oracle AI Database 26ai Free (official image). Use this image, not a *-slim community
-    # variant: slim images ship neither Oracle Text (no CTXSYS / CONTAINS operator, which the
-    # keyword + hybrid retrieval rungs need) nor DBMS_VECTOR_CHAIN.
-    image: container-registry.oracle.com/database/free:latest
+    # Oracle AI Database 26ai Free (official image), **lite** variant. It is the same engine build
+    # and the same component set as :latest — Oracle Text / CTXSYS, the DBMS_VECTOR* packages and
+    # the ONNX embedder loader are all present (verified, not assumed) — but it ships a *pre-built*
+    # database: 2.7 GB instead of 14.1 GB, ready in ~30 s instead of 3-5 minutes. That is what keeps
+    # a Codespace's 32 GB disk (and its creation time) comfortable for everyone.
+    # Still use this image rather than a *-slim community variant: slim images ship neither Oracle
+    # Text (no CTXSYS / CONTAINS operator, which the keyword + hybrid retrieval rungs need) nor
+    # DBMS_VECTOR_CHAIN.
+    image: container-registry.oracle.com/database/free:latest-lite
     restart: unless-stopped
     shm_size: "2g"
     # Expose Oracle only to the local host for local runs; service traffic still uses oracle:1521.
@@ -19,7 +24,13 @@ services:
     environment:
       ORACLE_PWD: OraclePwd_2025 # the SYS / SYSTEM / PDBADMIN password (used as ORA_ADMIN_PWD below)
     volumes:
-      - oracle-data:/opt/oracle/oradata # persist the database across restarts
+      # The trailing -26ai is deliberate. A data volume initialised by a different image cannot be
+      # opened by this one, and a database that fails to open stays unhealthy — which, together with
+      # the health-gated dependency this file used to have, is exactly what left a Codespace stuck in
+      # "recovery mode". Changing the volume name makes a stale/incompatible volume simply unused
+      # instead of asking every user to run `docker compose down -v` before rebuilding.
+      # Reclaim the old ones when convenient:  docker volume prune
+      - oracle-data-26ai:/opt/oracle/oradata # persist the database across restarts
       # Allocate the Vector Memory Pool (256M) so HNSW can build. Free images default it to 0,
       # and going 0 -> non-zero needs a restart, so this hook sets it + bounces the instance ONCE
       # (conditional/idempotent — a no-op once the pool is allocated). Must stay executable.
@@ -28,10 +39,10 @@ services:
       - ./oracle-init/vector-memory.sh:/opt/oracle/scripts/startup/01-vector-memory.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "/opt/oracle/checkDBStatus.sh"]
-      interval: 15s
+      interval: 10s
       timeout: 10s
-      retries: 40
-      start_period: 120s
+      retries: 30
+      start_period: 90s # the lite image is ready in ~30 s; allocate the vector pool adds one bounce
 
   app:
     image: mcr.microsoft.com/devcontainers/python:3.12
@@ -73,8 +84,14 @@ services:
       # here). Set RESET_ON_RUN=1 only if you run the notebook against a private database.
       RESET_ON_RUN: "0"
     depends_on:
+      # Deliberately service_started, NOT service_healthy. Waiting for health meant that a slow, or
+      # broken, database blocked the whole dev container — which is what Codespaces reports as
+      # "running in recovery mode due to a container error". The appbook is built to cope with a
+      # database that is still warming: backend.core.db.initialize() runs in a background thread,
+      # /api/health reports harness.ready and harness.error, and start-app.sh re-provisions on every
+      # start. Nothing about the developer experience is lost by not gating on health.
       oracle:
-        condition: service_healthy
+        condition: service_started
 
 volumes:
-  oracle-data:
+  oracle-data-26ai:

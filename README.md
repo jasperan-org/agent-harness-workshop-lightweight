@@ -40,7 +40,7 @@ curl http://localhost:8000/api/health
 tail -60 /tmp/total-recall-app.log
 ```
 
-The first Oracle start may take several minutes. The bootstrap is idempotent and does not reset existing data.
+The Oracle container uses the 26ai Free **lite** image — a pre-built database that is ready in about 30 seconds on a 2.7 GB image (same engine build and components as `:latest`, which takes 3-5 minutes and 14.1 GB). The bootstrap is idempotent and does not reset existing data.
 
 ## Run locally
 

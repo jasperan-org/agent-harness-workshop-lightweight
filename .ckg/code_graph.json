@@ -1,0 +1,3137 @@
+{
+  "edges": [
+    {
+      "dst": "sym:app/backend/config.py::Settings",
+      "kind": "contains",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "sym:app/backend/core/agent.py::_select_tool_names",
+      "kind": "contains",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "sym:app/backend/core/agent.py::_openai_tools",
+      "kind": "contains",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "sym:app/backend/core/agent.py::run_agent",
+      "kind": "contains",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_get_pool",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::q",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::x",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::ddl",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::status",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_reset_runtime_state",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_InDBEmbeddings",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_InDBEmbeddings.__init__",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_InDBEmbeddings._embed",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_InDBEmbeddings.embed_documents",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_InDBEmbeddings.embed_query",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_build_store",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_mark_text_search",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_row",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::initialize",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_ensure_tables",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_seed_schema",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::add_texts",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::embed_dims",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::embedding_preview",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::kw_search",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_substring_search",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::vec_search",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::hybrid_search",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::rerank",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::retrieve",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::scan_semantic_layer",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::semantic_search",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_seed_knowledge",
+      "kind": "contains",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "sym:app/backend/core/llm_client.py::text_of",
+      "kind": "contains",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.__init__",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.embed",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.embed_async",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_ensure",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::remember",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::recall",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_thread",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::add_turn",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::get_turns",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::context_card",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::capture_workflow",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::recall_workflow",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::list_threads",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::thread_messages",
+      "kind": "contains",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::register_tool",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::retrieve_tools",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::get_tool_schema",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::list_sources",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::run_sql",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::author_materialized_view",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_job",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::create_automation",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::list_automations",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::automation_status",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::run_automation_now",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::toggle_automation",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::automation_results",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::promote_file_to_memory",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_skill_md",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::save_skill",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::retrieve_skills",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::build_skill_manifest",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::load_skill",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::promote_workflow_to_skill",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::harvest_skills",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_fetch_skill_text",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_parse_frontmatter",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::register_skill_from_source",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::refresh_skills_from_source",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::register_default_tools",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::seed_starter_skills",
+      "kind": "contains",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::_abs",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::write",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::read",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::exists",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::listing",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::tail",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::read_range",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::grep",
+      "kind": "contains",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "sym:app/backend/core/sse.py::sse_response",
+      "kind": "contains",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "sym:app/backend/main.py::_warm",
+      "kind": "contains",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "sym:app/backend/main.py::lifespan",
+      "kind": "contains",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/agentloop.py::run",
+      "kind": "contains",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/agentloop.py::context_series",
+      "kind": "contains",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::NameReq",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::ToggleReq",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::CreateReq",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::list_automations",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::create",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::run",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::toggle",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::results",
+      "kind": "contains",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::health",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::embed",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::models",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::fs_write",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::fs_read",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::fs_list",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::acid_demo",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::retrieval",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::semantic",
+      "kind": "contains",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::chat",
+      "kind": "contains",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::card",
+      "kind": "contains",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::remember",
+      "kind": "contains",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::recall",
+      "kind": "contains",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::turns",
+      "kind": "contains",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::threads",
+      "kind": "contains",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::thread",
+      "kind": "contains",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::tools",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::manifest",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::load",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::list_skills",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::register_source",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::refresh",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::automations",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::create_automation",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::workflows",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::promote",
+      "kind": "contains",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::EmbedReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::WriteReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::SearchReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::ChatReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::FactReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::ToolQuery",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::SkillSourceReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::AutomationReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::PromoteReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:app/backend/schemas.py::AgentReq",
+      "kind": "contains",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::load_oci_keys",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::is_rate_limit_error",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.__init__",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.current",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.current_index",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.advance",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.__len__",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::call_with_failover",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::call_with_failover_async",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::make_rotating_oamp_llm",
+      "kind": "contains",
+      "src": "file:oci_key_rotation.py"
+    },
+    {
+      "dst": "sym:scripts/build_student_notebook.py::load",
+      "kind": "contains",
+      "src": "file:scripts/build_student_notebook.py"
+    },
+    {
+      "dst": "sym:scripts/build_student_notebook.py::sources",
+      "kind": "contains",
+      "src": "file:scripts/build_student_notebook.py"
+    },
+    {
+      "dst": "sym:scripts/build_student_notebook.py::main",
+      "kind": "contains",
+      "src": "file:scripts/build_student_notebook.py"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::connect_with_retry",
+      "kind": "contains",
+      "src": "file:scripts/seed_oracle.py"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::ddl_idempotent",
+      "kind": "contains",
+      "src": "file:scripts/seed_oracle.py"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::is_model_loaded",
+      "kind": "contains",
+      "src": "file:scripts/seed_oracle.py"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::package_present",
+      "kind": "contains",
+      "src": "file:scripts/seed_oracle.py"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::ensure_model_file",
+      "kind": "contains",
+      "src": "file:scripts/seed_oracle.py"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::load_onnx_model",
+      "kind": "contains",
+      "src": "file:scripts/seed_oracle.py"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::main",
+      "kind": "contains",
+      "src": "file:scripts/seed_oracle.py"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::create",
+      "kind": "call",
+      "src": "sym:app/backend/core/agent.py::create"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::get_tool_schema",
+      "kind": "call",
+      "src": "sym:app/backend/core/agent.py::get_tool_schema"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::retrieve_tools",
+      "kind": "call",
+      "src": "sym:app/backend/core/agent.py::retrieve_tools"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_InDBEmbeddings",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_InDBEmbeddings"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_build_store",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_build_store"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_InDBEmbeddings._embed",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_embed"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_ensure_tables",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_ensure_tables"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_get_pool",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_get_pool"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_mark_text_search",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_mark_text_search"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_reset_runtime_state",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_reset_runtime_state"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_row",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_row"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_seed_knowledge",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_seed_knowledge"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_seed_schema",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_seed_schema"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::_substring_search",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::_substring_search"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::add_texts",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::add_texts"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::ddl",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::ddl"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::hybrid_search",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::hybrid_search"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::kw_search",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::kw_search"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::q",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::q"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::register_default_tools",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::register_default_tools"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::rerank",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::rerank"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::scan_semantic_layer",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::scan_semantic_layer"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::seed_starter_skills",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::seed_starter_skills"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::vec_search",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::vec_search"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::x",
+      "kind": "call",
+      "src": "sym:app/backend/core/db.py::x"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder",
+      "kind": "call",
+      "src": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_ensure",
+      "kind": "call",
+      "src": "sym:app/backend/core/memory.py::_ensure"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_thread",
+      "kind": "call",
+      "src": "sym:app/backend/core/memory.py::_thread"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.embed",
+      "kind": "call",
+      "src": "sym:app/backend/core/memory.py::embed"
+    },
+    {
+      "dst": "sym:app/backend/routers/layers.py::embed",
+      "kind": "call",
+      "src": "sym:app/backend/core/memory.py::embed"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::q",
+      "kind": "call",
+      "src": "sym:app/backend/core/memory.py::q"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::x",
+      "kind": "call",
+      "src": "sym:app/backend/core/memory.py::x"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::_abs",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::_abs"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_fetch_skill_text",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::_fetch_skill_text"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_job",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::_job"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_parse_frontmatter",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::_parse_frontmatter"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::_skill_md",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::_skill_md"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::author_materialized_view",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::author_materialized_view"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::automation_status",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::automation_status"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::build_skill_manifest",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::build_skill_manifest"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::capture_workflow",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::capture_workflow"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::create",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::create"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::create_automation",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::create_automation"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::ddl",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::ddl"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::list_sources",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::list_sources"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::load_skill",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::load_skill"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::promote_file_to_memory",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::promote_file_to_memory"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::promote_workflow_to_skill",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::promote_workflow_to_skill"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::q",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::q"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::read",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::read"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::recall",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::recall"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::recall",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::recall"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::recall_workflow",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::recall_workflow"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::register_tool",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::register_tool"
+    },
+    {
+      "dst": "sym:app/backend/core/memory.py::remember",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::remember"
+    },
+    {
+      "dst": "sym:app/backend/routers/memory.py::remember",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::remember"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::retrieve_skills",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::retrieve_skills"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::run_automation_now",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::run_automation_now"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::run_sql",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::run_sql"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::save_skill",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::save_skill"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::toggle_automation",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::toggle_automation"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::x",
+      "kind": "call",
+      "src": "sym:app/backend/core/registries.py::x"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::_abs",
+      "kind": "call",
+      "src": "sym:app/backend/core/scratch.py::_abs"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::listing",
+      "kind": "call",
+      "src": "sym:app/backend/core/scratch.py::listing"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::q",
+      "kind": "call",
+      "src": "sym:app/backend/core/scratch.py::q"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::read",
+      "kind": "call",
+      "src": "sym:app/backend/core/scratch.py::read"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::x",
+      "kind": "call",
+      "src": "sym:app/backend/core/scratch.py::x"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::initialize",
+      "kind": "call",
+      "src": "sym:app/backend/main.py::initialize"
+    },
+    {
+      "dst": "sym:app/backend/core/agent.py::run_agent",
+      "kind": "call",
+      "src": "sym:app/backend/routers/agentloop.py::run_agent"
+    },
+    {
+      "dst": "sym:app/backend/core/sse.py::sse_response",
+      "kind": "call",
+      "src": "sym:app/backend/routers/agentloop.py::sse_response"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::automation_results",
+      "kind": "call",
+      "src": "sym:app/backend/routers/automations.py::automation_results"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::automation_status",
+      "kind": "call",
+      "src": "sym:app/backend/routers/automations.py::automation_status"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::create_automation",
+      "kind": "call",
+      "src": "sym:app/backend/routers/automations.py::create_automation"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::create_automation",
+      "kind": "call",
+      "src": "sym:app/backend/routers/automations.py::create_automation"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::run_automation_now",
+      "kind": "call",
+      "src": "sym:app/backend/routers/automations.py::run_automation_now"
+    },
+    {
+      "dst": "sym:app/backend/core/registries.py::toggle_automation",
+      "kind": "call",
+      "src": "sym:app/backend/routers/automations.py::toggle_automation"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::_abs",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::_abs"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::ddl",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::ddl"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::grep",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::grep"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::q",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::q"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::read",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::read"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::status",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::status"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::tail",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::tail"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::write",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::write"
+    },
+    {
+      "dst": "sym:app/backend/core/db.py::x",
+      "kind": "call",
+      "src": "sym:app/backend/routers/layers.py::x"
+    },
+    {
+      "dst": "sym:app/backend/routers/automations.py::create",
+      "kind": "call",
+      "src": "sym:app/backend/routers/memory.py::create"
+    },
+    {
+      "dst": "sym:app/backend/core/sse.py::sse_response",
+      "kind": "call",
+      "src": "sym:app/backend/routers/memory.py::sse_response"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::_abs",
+      "kind": "call",
+      "src": "sym:app/backend/routers/skills.py::_abs"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.advance",
+      "kind": "call",
+      "src": "sym:oci_key_rotation.py::advance"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::call_with_failover",
+      "kind": "call",
+      "src": "sym:oci_key_rotation.py::call_with_failover"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::call_with_failover_async",
+      "kind": "call",
+      "src": "sym:oci_key_rotation.py::call_with_failover_async"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.current",
+      "kind": "call",
+      "src": "sym:oci_key_rotation.py::current"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::KeyRotator.current_index",
+      "kind": "call",
+      "src": "sym:oci_key_rotation.py::current_index"
+    },
+    {
+      "dst": "sym:oci_key_rotation.py::is_rate_limit_error",
+      "kind": "call",
+      "src": "sym:oci_key_rotation.py::is_rate_limit_error"
+    },
+    {
+      "dst": "sym:app/backend/routers/skills.py::load",
+      "kind": "call",
+      "src": "sym:scripts/build_student_notebook.py::load"
+    },
+    {
+      "dst": "sym:scripts/build_student_notebook.py::sources",
+      "kind": "call",
+      "src": "sym:scripts/build_student_notebook.py::sources"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::connect_with_retry",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::connect_with_retry"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::ddl_idempotent",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::ddl_idempotent"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::ensure_model_file",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::ensure_model_file"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::exists",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::exists"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::is_model_loaded",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::is_model_loaded"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::load_onnx_model",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::load_onnx_model"
+    },
+    {
+      "dst": "sym:scripts/seed_oracle.py::package_present",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::package_present"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::read",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::read"
+    },
+    {
+      "dst": "sym:app/backend/core/scratch.py::write",
+      "kind": "call",
+      "src": "sym:scripts/seed_oracle.py::write"
+    },
+    {
+      "dst": "file:app/backend/config.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/agent.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/db.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/llm_client.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/registries.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/agent.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/db.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/llm_client.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/registries.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:oci_key_rotation.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/config.py"
+    },
+    {
+      "dst": "file:app/backend/core/agent.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/db.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/llm_client.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/registries.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/core/db.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/core/llm_client.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/core/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/core/registries.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/agent.py"
+    },
+    {
+      "dst": "file:app/backend/core/llm_client.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/core/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/core/registries.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/db.py"
+    },
+    {
+      "dst": "file:app/backend/core/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/core/registries.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/llm_client.py"
+    },
+    {
+      "dst": "file:app/backend/core/registries.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/memory.py"
+    },
+    {
+      "dst": "file:app/backend/core/scratch.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/registries.py"
+    },
+    {
+      "dst": "file:app/backend/core/sse.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/scratch.py"
+    },
+    {
+      "dst": "file:app/backend/main.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/core/sse.py"
+    },
+    {
+      "dst": "file:app/backend/routers/__init__.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/main.py"
+    },
+    {
+      "dst": "file:app/backend/routers/agentloop.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/__init__.py"
+    },
+    {
+      "dst": "file:app/backend/routers/automations.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/agentloop.py"
+    },
+    {
+      "dst": "file:app/backend/routers/layers.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/automations.py"
+    },
+    {
+      "dst": "file:app/backend/routers/memory.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/layers.py"
+    },
+    {
+      "dst": "file:app/backend/routers/skills.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/memory.py"
+    },
+    {
+      "dst": "file:app/backend/schemas.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/routers/skills.py"
+    },
+    {
+      "dst": "file:scripts/build_student_notebook.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:app/backend/schemas.py"
+    },
+    {
+      "dst": "file:scripts/seed_oracle.py",
+      "kind": "co_edit",
+      "src": "file:scripts/build_student_notebook.py"
+    }
+  ],
+  "meta": {
+    "n_edges": 450,
+    "n_files": 21,
+    "n_nodes": 175,
+    "pkg_root": "agent-harness-workshop-lightweight"
+  },
+  "nodes": {
+    "file:app/backend/__init__.py": {
+      "id": "file:app/backend/__init__.py",
+      "kind": "file",
+      "text": "Module app/backend/__init__.py in agent-harness-workshop-lightweight."
+    },
+    "file:app/backend/config.py": {
+      "id": "file:app/backend/config.py",
+      "kind": "file",
+      "text": "Module app/backend/config.py in agent-harness-workshop-lightweight. doc: Central configuration for the Total Recall appbook.; strings: https://inference.generativeai.us-phoenix-1.oci.oraclecloud.com, xai.grok-4.20-non-reasoning, localhost:1521/FREEPDB1, OCI_GENAI_ENDPOINT, ALL_MINILM_L12_V2, OCI_GENAI_API_KEY, ORA_AGENT_USER, OPENAI_API_KEY, ORACLE_ENABLED, TR_MAX_TOKENS"
+    },
+    "file:app/backend/core/__init__.py": {
+      "id": "file:app/backend/core/__init__.py",
+      "kind": "file",
+      "text": "Module app/backend/core/__init__.py in agent-harness-workshop-lightweight."
+    },
+    "file:app/backend/core/agent.py": {
+      "id": "file:app/backend/core/agent.py",
+      "kind": "file",
+      "text": "Module app/backend/core/agent.py in agent-harness-workshop-lightweight. doc: The agent loop: assemble grounded context (semantic catalog + skill manifest +; strings: create_automation, recall_workflow, search_memory, system_chars, list_sources, tool_call_id, OCCURRENCES, description, tool_result, tool_choice"
+    },
+    "file:app/backend/core/db.py": {
+      "id": "file:app/backend/core/db.py",
+      "kind": "file",
+      "text": "Module app/backend/core/db.py in agent-harness-workshop-lightweight. doc: Database substrate for the appbook: a connection pool, idempotent harness setup,; strings: Drop partially-built vector-store state so a later warm-up can retry cleanly., Enterprise-segment customers have the highest average order value., INSERT INTO orders VALUES (:oid, :cust, SYSDATE - :age, :st, :ch), Supplier concentration is the top operational risk this quarter., Returns spike in the Apparel category right after the holidays., Customer churn rises sharply when delivery exceeds five days., INSERT INTO customers VALUES (:1,:2,:3,:4,:5, SYSDATE - :6), A dual-sourcing decision for Outdoors is targeted for Q1., WHERE JSON_VALUE(metadata,'$.namespace')='__bootstrap', , FLOAT32), created_at TIMESTAMP DEFAULT SYSTIMESTAMP)"
+    },
+    "file:app/backend/core/llm_client.py": {
+      "id": "file:app/backend/core/llm_client.py",
+      "kind": "file",
+      "text": "Module app/backend/core/llm_client.py in agent-harness-workshop-lightweight. doc: Shared LLM client \u2014 OCI Generative AI via its OpenAI-compatible endpoint, so Oracle powers the; strings: Extract the assistant text from an OpenAI ChatCompletion response., [llm_client] OCI key rotation active:, key(s); this worker starts on key #, LLM_API_KEY_NOT_SET, Accept-Encoding, identity, oci"
+    },
+    "file:app/backend/core/memory.py": {
+      "id": "file:app/backend/core/memory.py",
+      "kind": "file",
+      "text": "Module app/backend/core/memory.py in agent-harness-workshop-lightweight. doc: Cognitive memory via the Oracle AI Agent Memory package (OAMP), with an; strings: All messages of one thread, in order, for re-opening a past conversation., An analytics engineer who prefers concise, decision-first answers., A retail-analytics agent that grounds answers in the database., USING :t AS DATA) v FROM dual, SELECT VECTOR_EMBEDDING(, create_if_necessary, USING :i AS DATA)), distance, inserted, content"
+    },
+    "file:app/backend/core/registries.py": {
+      "id": "file:app/backend/core/registries.py",
+      "kind": "file",
+      "text": "Module app/backend/core/registries.py in agent-harness-workshop-lightweight. doc: Tool & skill registries (DB-backed, embedding-retrieved), automations, and the; strings: SELECT name, sha, source_url FROM agent_skills WHERE source_url IS NOT NULL, Refresh the automation's materialized view now and return its latest rows., Compute net revenue grouped by product category over a recent window, \\b(INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|MERGE|GRANT|CREATE)\\b, Promote a SELECT into a scheduled, refreshed materialized view., Start (enable) or stop (disable) an automation's scheduled job., UPDATE agent_workflow SET promoted='Y' WHERE RAWTOHEX(id)=:i, Start (enable) or stop (disable) an automation's schedule., Refresh an automation now and return its latest rows., Promote a scratch file into durable long-term memory."
+    },
+    "file:app/backend/core/scratch.py": {
+      "id": "file:app/backend/core/scratch.py",
+      "kind": "file",
+      "text": "Module app/backend/core/scratch.py in agent-harness-workshop-lightweight. doc: The in-database scratch filesystem (SecureFile-LOB backed) + progressive-disclosure; strings: SELECT content FROM agent_scratch WHERE path=:p, SELECT 1 FROM agent_scratch WHERE path=:p, /scratch, CONTENT, replace, utf-8, path, line, text, PATH"
+    },
+    "file:app/backend/core/sse.py": {
+      "id": "file:app/backend/core/sse.py",
+      "kind": "file",
+      "text": "Module app/backend/core/sse.py in agent-harness-workshop-lightweight. doc: Turn an async generator of dict events into a Server-Sent-Events response.; strings: Turn an async generator of dict events into a Server-Sent-Events response., event, data, end"
+    },
+    "file:app/backend/main.py": {
+      "id": "file:app/backend/main.py",
+      "kind": "file",
+      "text": "Module app/backend/main.py in agent-harness-workshop-lightweight. doc: Total Recall appbook \u2014 FastAPI application.; strings: Total Recall \u2014 Appbook, backend.main:app, 127.0.0.1, frontend, __main__, /images, images, 1.0.0"
+    },
+    "file:app/backend/routers/__init__.py": {
+      "id": "file:app/backend/routers/__init__.py",
+      "kind": "file",
+      "text": "Module app/backend/routers/__init__.py in agent-harness-workshop-lightweight."
+    },
+    "file:app/backend/routers/agentloop.py": {
+      "id": "file:app/backend/routers/agentloop.py",
+      "kind": "file",
+      "text": "Module app/backend/routers/agentloop.py in agent-harness-workshop-lightweight. doc: Layer 7 \u2014 The Agent Loop, and Layer 8 \u2014 Context Engineering.; strings: The 'money shot' series: context size per turn, engineering OFF vs ON., Layer 7 \u2014 The Agent Loop, and Layer 8 \u2014 Context Engineering., /context/series, /agent/run, agent, /api, off"
+    },
+    "file:app/backend/routers/automations.py": {
+      "id": "file:app/backend/routers/automations.py",
+      "kind": "file",
+      "text": "Module app/backend/routers/automations.py in agent-harness-workshop-lightweight. doc: Automation control: list with live schedule state, run-now, start/stop, results.; strings: /api/automations, automations, /results, /toggle, /create, /run"
+    },
+    "file:app/backend/routers/layers.py": {
+      "id": "file:app/backend/routers/layers.py",
+      "kind": "file",
+      "text": "Module app/backend/routers/layers.py in agent-harness-workshop-lightweight. doc: Read-path layers: health, foundation (in-DB embeddings), substrate (scratch FS),; strings: SELECT model_name, mining_function FROM user_mining_models ORDER BY 1, Lost-update race: an OS file with no lock vs. an atomic DB UPDATE., CREATE TABLE race_counter (id NUMBER PRIMARY KEY, n NUMBER), UPDATE race_counter SET n=n+1 WHERE id=1, SELECT n FROM race_counter WHERE id=1, tr_appbook_counter.txt, /foundation/models, /foundation/embed, /retrieval/search, /semantic/search"
+    },
+    "file:app/backend/routers/memory.py": {
+      "id": "file:app/backend/routers/memory.py",
+      "kind": "file",
+      "text": "Module app/backend/routers/memory.py in agent-harness-workshop-lightweight. doc: Layer 4 \u2014 Cognitive memory (OAMP). A chat that remembers across turns and; strings: Chat request failed:, /api/memory, /remember, assistant, /threads, messages, content, appbook, /recall, /thread"
+    },
+    "file:app/backend/routers/skills.py": {
+      "id": "file:app/backend/routers/skills.py",
+      "kind": "file",
+      "text": "Module app/backend/routers/skills.py in agent-harness-workshop-lightweight. doc: Layer 6 \u2014 Skills & Automations: the tool registry, the skill registry (with SHA +; strings: /create_automation, /register_source, /automations, description:, /api/skills, description, automations, TOOL_SCHEMA, DESCRIPTION, SOURCE_URL"
+    },
+    "file:app/backend/schemas.py": {
+      "id": "file:app/backend/schemas.py",
+      "kind": "file",
+      "text": "Module app/backend/schemas.py in agent-harness-workshop-lightweight. doc: Pydantic request bodies for the appbook API.; strings: Pydantic request bodies for the appbook API., appbook, hybrid"
+    },
+    "file:oci_key_rotation.py": {
+      "id": "file:oci_key_rotation.py",
+      "kind": "file",
+      "text": "Module oci_key_rotation.py in agent-harness-workshop-lightweight. doc: Shared OCI Generative AI API-key rotation for the notebook and app.; strings: Build an OAMP-compatible LLM wrapper that rotates OCI keys on failure., Collect configured OCI keys in order, de-duplicated and sanitized., Return whether an exception is worth failing over to another key., Retry a call across at most two sweeps of the configured keys., Random starting key with sticky circular failover., Async counterpart to :func:`call_with_failover`., [key-rotation] switching to key #, OCI_GENAI_API_KEY_1, service unavailable, OCI_GENAI_API_KEY_"
+    },
+    "file:scripts/build_student_notebook.py": {
+      "id": "file:scripts/build_student_notebook.py",
+      "kind": "file",
+      "text": "Module scripts/build_student_notebook.py in agent-harness-workshop-lightweight. doc: Validate the checked-in lightweight workshop notebooks.; strings: student notebook should contain exactly 5 TODO stubs, found, complete notebook still contains a TODO stub, required workshop symbols are missing:, hybrid_rrf_search_memories, notebook validation passed, notebook_complete.ipynb, notebook_student.ipynb, cells, no TODO stubs, : missing cells list, cells, 5 TODO stubs"
+    },
+    "file:scripts/seed_oracle.py": {
+      "id": "file:scripts/seed_oracle.py",
+      "kind": "file",
+      "text": "Module scripts/seed_oracle.py in agent-harness-workshop-lightweight. doc: Provision the Oracle AI Database for the workshop \u2014 run once in the Codespace / dev container.; strings: Whether the database ships a package/synonym (gates the optional grants above)., Run CREATE/DROP/GRANT DDL, swallowing the 'already exists' family of errors., Prefer a local cache; download from the bucket only if missing or truncated., The appbook can now warm; the notebook will build the rest of the harness., GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW TO {a}, BEGIN DBMS_VECTOR.LOAD_ONNX_MODEL(:name, :data, JSON(:meta)); END;, GRANT CREATE PROCEDURE, CREATE MATERIALIZED VIEW TO {a}, SELECT 1 FROM user_mining_models WHERE model_name = :m, is not present on this image \u2014 skipping its grant, GRANT EXECUTE ON DBMS_VECTOR_CHAIN TO {a}"
+    },
+    "sym:app/backend/config.py::Settings": {
+      "id": "sym:app/backend/config.py::Settings",
+      "kind": "sym",
+      "text": "Settings in app/backend/config.py (agent-harness-workshop-lightweight). class Settings"
+    },
+    "sym:app/backend/core/agent.py::_openai_tools": {
+      "id": "sym:app/backend/core/agent.py::_openai_tools",
+      "kind": "sym",
+      "text": "_openai_tools in app/backend/core/agent.py (agent-harness-workshop-lightweight). def _openai_tools(names) doc: Build OpenAI function-tool schemas from the registry (the OCI endpoint speaks this format)."
+    },
+    "sym:app/backend/core/agent.py::_select_tool_names": {
+      "id": "sym:app/backend/core/agent.py::_select_tool_names",
+      "kind": "sym",
+      "text": "_select_tool_names in app/backend/core/agent.py (agent-harness-workshop-lightweight). def _select_tool_names(query, k)"
+    },
+    "sym:app/backend/core/agent.py::run_agent": {
+      "id": "sym:app/backend/core/agent.py::run_agent",
+      "kind": "sym",
+      "text": "run_agent in app/backend/core/agent.py (agent-harness-workshop-lightweight). def run_agent(prompt, thread_id)"
+    },
+    "sym:app/backend/core/db.py::_InDBEmbeddings": {
+      "id": "sym:app/backend/core/db.py::_InDBEmbeddings",
+      "kind": "sym",
+      "text": "_InDBEmbeddings in app/backend/core/db.py (agent-harness-workshop-lightweight). class _InDBEmbeddings"
+    },
+    "sym:app/backend/core/db.py::_InDBEmbeddings.__init__": {
+      "id": "sym:app/backend/core/db.py::_InDBEmbeddings.__init__",
+      "kind": "sym",
+      "text": "__init__ in app/backend/core/db.py (agent-harness-workshop-lightweight). def __init__(self, conn)"
+    },
+    "sym:app/backend/core/db.py::_InDBEmbeddings._embed": {
+      "id": "sym:app/backend/core/db.py::_InDBEmbeddings._embed",
+      "kind": "sym",
+      "text": "_embed in app/backend/core/db.py (agent-harness-workshop-lightweight). def _embed(self, texts)"
+    },
+    "sym:app/backend/core/db.py::_InDBEmbeddings.embed_documents": {
+      "id": "sym:app/backend/core/db.py::_InDBEmbeddings.embed_documents",
+      "kind": "sym",
+      "text": "embed_documents in app/backend/core/db.py (agent-harness-workshop-lightweight). def embed_documents(self, texts)"
+    },
+    "sym:app/backend/core/db.py::_InDBEmbeddings.embed_query": {
+      "id": "sym:app/backend/core/db.py::_InDBEmbeddings.embed_query",
+      "kind": "sym",
+      "text": "embed_query in app/backend/core/db.py (agent-harness-workshop-lightweight). def embed_query(self, text)"
+    },
+    "sym:app/backend/core/db.py::_build_store": {
+      "id": "sym:app/backend/core/db.py::_build_store",
+      "kind": "sym",
+      "text": "_build_store in app/backend/core/db.py (agent-harness-workshop-lightweight). def _build_store() doc: Create the OracleVS store + in-database embeddings + keyword retriever, and"
+    },
+    "sym:app/backend/core/db.py::_ensure_tables": {
+      "id": "sym:app/backend/core/db.py::_ensure_tables",
+      "kind": "sym",
+      "text": "_ensure_tables in app/backend/core/db.py (agent-harness-workshop-lightweight). def _ensure_tables()"
+    },
+    "sym:app/backend/core/db.py::_get_pool": {
+      "id": "sym:app/backend/core/db.py::_get_pool",
+      "kind": "sym",
+      "text": "_get_pool in app/backend/core/db.py (agent-harness-workshop-lightweight). def _get_pool()"
+    },
+    "sym:app/backend/core/db.py::_mark_text_search": {
+      "id": "sym:app/backend/core/db.py::_mark_text_search",
+      "kind": "sym",
+      "text": "_mark_text_search in app/backend/core/db.py (agent-harness-workshop-lightweight). def _mark_text_search(ok)"
+    },
+    "sym:app/backend/core/db.py::_reset_runtime_state": {
+      "id": "sym:app/backend/core/db.py::_reset_runtime_state",
+      "kind": "sym",
+      "text": "_reset_runtime_state in app/backend/core/db.py (agent-harness-workshop-lightweight). def _reset_runtime_state() doc: Drop partially-built vector-store state so a later warm-up can retry cleanly."
+    },
+    "sym:app/backend/core/db.py::_row": {
+      "id": "sym:app/backend/core/db.py::_row",
+      "kind": "sym",
+      "text": "_row in app/backend/core/db.py (agent-harness-workshop-lightweight). def _row(doc, score) doc: Adapt a langchain Document to the dict-row shape the rest of the app uses (CONTENT key)."
+    },
+    "sym:app/backend/core/db.py::_seed_knowledge": {
+      "id": "sym:app/backend/core/db.py::_seed_knowledge",
+      "kind": "sym",
+      "text": "_seed_knowledge in app/backend/core/db.py (agent-harness-workshop-lightweight). def _seed_knowledge()"
+    },
+    "sym:app/backend/core/db.py::_seed_schema": {
+      "id": "sym:app/backend/core/db.py::_seed_schema",
+      "kind": "sym",
+      "text": "_seed_schema in app/backend/core/db.py (agent-harness-workshop-lightweight). def _seed_schema()"
+    },
+    "sym:app/backend/core/db.py::_substring_search": {
+      "id": "sym:app/backend/core/db.py::_substring_search",
+      "kind": "sym",
+      "text": "_substring_search in app/backend/core/db.py (agent-harness-workshop-lightweight). def _substring_search(query, namespace, k) doc: Keyword fallback with no Oracle Text dependency: rank rows by matched query terms."
+    },
+    "sym:app/backend/core/db.py::add_texts": {
+      "id": "sym:app/backend/core/db.py::add_texts",
+      "kind": "sym",
+      "text": "add_texts in app/backend/core/db.py (agent-harness-workshop-lightweight). def add_texts(texts, metadatas, namespace)"
+    },
+    "sym:app/backend/core/db.py::ddl": {
+      "id": "sym:app/backend/core/db.py::ddl",
+      "kind": "sym",
+      "text": "ddl in app/backend/core/db.py (agent-harness-workshop-lightweight). def ddl(sql)"
+    },
+    "sym:app/backend/core/db.py::embed_dims": {
+      "id": "sym:app/backend/core/db.py::embed_dims",
+      "kind": "sym",
+      "text": "embed_dims in app/backend/core/db.py (agent-harness-workshop-lightweight). def embed_dims(text)"
+    },
+    "sym:app/backend/core/db.py::embedding_preview": {
+      "id": "sym:app/backend/core/db.py::embedding_preview",
+      "kind": "sym",
+      "text": "embedding_preview in app/backend/core/db.py (agent-harness-workshop-lightweight). def embedding_preview(text, n)"
+    },
+    "sym:app/backend/core/db.py::hybrid_search": {
+      "id": "sym:app/backend/core/db.py::hybrid_search",
+      "kind": "sym",
+      "text": "hybrid_search in app/backend/core/db.py (agent-harness-workshop-lightweight). def hybrid_search(query, namespace, k, pool, c)"
+    },
+    "sym:app/backend/core/db.py::initialize": {
+      "id": "sym:app/backend/core/db.py::initialize",
+      "kind": "sym",
+      "text": "initialize in app/backend/core/db.py (agent-harness-workshop-lightweight). def initialize()"
+    },
+    "sym:app/backend/core/db.py::kw_search": {
+      "id": "sym:app/backend/core/db.py::kw_search",
+      "kind": "sym",
+      "text": "kw_search in app/backend/core/db.py (agent-harness-workshop-lightweight). def kw_search(query, namespace, k) doc: Keyword rung of the retrieval ladder."
+    },
+    "sym:app/backend/core/db.py::q": {
+      "id": "sym:app/backend/core/db.py::q",
+      "kind": "sym",
+      "text": "q in app/backend/core/db.py (agent-harness-workshop-lightweight). def q(sql, params)"
+    },
+    "sym:app/backend/core/db.py::rerank": {
+      "id": "sym:app/backend/core/db.py::rerank",
+      "kind": "sym",
+      "text": "rerank in app/backend/core/db.py (agent-harness-workshop-lightweight). def rerank(query, candidates, k)"
+    },
+    "sym:app/backend/core/db.py::retrieve": {
+      "id": "sym:app/backend/core/db.py::retrieve",
+      "kind": "sym",
+      "text": "retrieve in app/backend/core/db.py (agent-harness-workshop-lightweight). def retrieve(query, technique, namespace, k)"
+    },
+    "sym:app/backend/core/db.py::scan_semantic_layer": {
+      "id": "sym:app/backend/core/db.py::scan_semantic_layer",
+      "kind": "sym",
+      "text": "scan_semantic_layer in app/backend/core/db.py (agent-harness-workshop-lightweight). def scan_semantic_layer()"
+    },
+    "sym:app/backend/core/db.py::semantic_search": {
+      "id": "sym:app/backend/core/db.py::semantic_search",
+      "kind": "sym",
+      "text": "semantic_search in app/backend/core/db.py (agent-harness-workshop-lightweight). def semantic_search(query, k)"
+    },
+    "sym:app/backend/core/db.py::status": {
+      "id": "sym:app/backend/core/db.py::status",
+      "kind": "sym",
+      "text": "status in app/backend/core/db.py (agent-harness-workshop-lightweight). def status()"
+    },
+    "sym:app/backend/core/db.py::vec_search": {
+      "id": "sym:app/backend/core/db.py::vec_search",
+      "kind": "sym",
+      "text": "vec_search in app/backend/core/db.py (agent-harness-workshop-lightweight). def vec_search(query, namespace, k)"
+    },
+    "sym:app/backend/core/db.py::x": {
+      "id": "sym:app/backend/core/db.py::x",
+      "kind": "sym",
+      "text": "x in app/backend/core/db.py (agent-harness-workshop-lightweight). def x(sql, params, many)"
+    },
+    "sym:app/backend/core/llm_client.py::text_of": {
+      "id": "sym:app/backend/core/llm_client.py::text_of",
+      "kind": "sym",
+      "text": "text_of in app/backend/core/llm_client.py (agent-harness-workshop-lightweight). def text_of(response) doc: Extract the assistant text from an OpenAI ChatCompletion response."
+    },
+    "sym:app/backend/core/memory.py::_InDBOnnxEmbedder": {
+      "id": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder",
+      "kind": "sym",
+      "text": "_InDBOnnxEmbedder in app/backend/core/memory.py (agent-harness-workshop-lightweight). class _InDBOnnxEmbedder"
+    },
+    "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.__init__": {
+      "id": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.__init__",
+      "kind": "sym",
+      "text": "__init__ in app/backend/core/memory.py (agent-harness-workshop-lightweight). def __init__(self, conn)"
+    },
+    "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.embed": {
+      "id": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.embed",
+      "kind": "sym",
+      "text": "embed in app/backend/core/memory.py (agent-harness-workshop-lightweight). def embed(self, texts)"
+    },
+    "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.embed_async": {
+      "id": "sym:app/backend/core/memory.py::_InDBOnnxEmbedder.embed_async",
+      "kind": "sym",
+      "text": "embed_async in app/backend/core/memory.py (agent-harness-workshop-lightweight). def embed_async(self, texts)"
+    },
+    "sym:app/backend/core/memory.py::_ensure": {
+      "id": "sym:app/backend/core/memory.py::_ensure",
+      "kind": "sym",
+      "text": "_ensure in app/backend/core/memory.py (agent-harness-workshop-lightweight). def _ensure()"
+    },
+    "sym:app/backend/core/memory.py::_thread": {
+      "id": "sym:app/backend/core/memory.py::_thread",
+      "kind": "sym",
+      "text": "_thread in app/backend/core/memory.py (agent-harness-workshop-lightweight). def _thread(thread_id)"
+    },
+    "sym:app/backend/core/memory.py::add_turn": {
+      "id": "sym:app/backend/core/memory.py::add_turn",
+      "kind": "sym",
+      "text": "add_turn in app/backend/core/memory.py (agent-harness-workshop-lightweight). def add_turn(thread_id, role, content)"
+    },
+    "sym:app/backend/core/memory.py::capture_workflow": {
+      "id": "sym:app/backend/core/memory.py::capture_workflow",
+      "kind": "sym",
+      "text": "capture_workflow in app/backend/core/memory.py (agent-harness-workshop-lightweight). def capture_workflow(intent, steps, tools_used)"
+    },
+    "sym:app/backend/core/memory.py::context_card": {
+      "id": "sym:app/backend/core/memory.py::context_card",
+      "kind": "sym",
+      "text": "context_card in app/backend/core/memory.py (agent-harness-workshop-lightweight). def context_card(thread_id, recent, relevant)"
+    },
+    "sym:app/backend/core/memory.py::get_turns": {
+      "id": "sym:app/backend/core/memory.py::get_turns",
+      "kind": "sym",
+      "text": "get_turns in app/backend/core/memory.py (agent-harness-workshop-lightweight). def get_turns(thread_id)"
+    },
+    "sym:app/backend/core/memory.py::list_threads": {
+      "id": "sym:app/backend/core/memory.py::list_threads",
+      "kind": "sym",
+      "text": "list_threads in app/backend/core/memory.py (agent-harness-workshop-lightweight). def list_threads(prefix, limit) doc: Past conversations: thread id, message count, last activity, and a preview"
+    },
+    "sym:app/backend/core/memory.py::recall": {
+      "id": "sym:app/backend/core/memory.py::recall",
+      "kind": "sym",
+      "text": "recall in app/backend/core/memory.py (agent-harness-workshop-lightweight). def recall(query, k)"
+    },
+    "sym:app/backend/core/memory.py::recall_workflow": {
+      "id": "sym:app/backend/core/memory.py::recall_workflow",
+      "kind": "sym",
+      "text": "recall_workflow in app/backend/core/memory.py (agent-harness-workshop-lightweight). def recall_workflow(query, k)"
+    },
+    "sym:app/backend/core/memory.py::remember": {
+      "id": "sym:app/backend/core/memory.py::remember",
+      "kind": "sym",
+      "text": "remember in app/backend/core/memory.py (agent-harness-workshop-lightweight). def remember(content)"
+    },
+    "sym:app/backend/core/memory.py::thread_messages": {
+      "id": "sym:app/backend/core/memory.py::thread_messages",
+      "kind": "sym",
+      "text": "thread_messages in app/backend/core/memory.py (agent-harness-workshop-lightweight). def thread_messages(thread_id) doc: All messages of one thread, in order, for re-opening a past conversation."
+    },
+    "sym:app/backend/core/registries.py::_fetch_skill_text": {
+      "id": "sym:app/backend/core/registries.py::_fetch_skill_text",
+      "kind": "sym",
+      "text": "_fetch_skill_text in app/backend/core/registries.py (agent-harness-workshop-lightweight). def _fetch_skill_text(src)"
+    },
+    "sym:app/backend/core/registries.py::_job": {
+      "id": "sym:app/backend/core/registries.py::_job",
+      "kind": "sym",
+      "text": "_job in app/backend/core/registries.py (agent-harness-workshop-lightweight). def _job(job, action, repeat)"
+    },
+    "sym:app/backend/core/registries.py::_parse_frontmatter": {
+      "id": "sym:app/backend/core/registries.py::_parse_frontmatter",
+      "kind": "sym",
+      "text": "_parse_frontmatter in app/backend/core/registries.py (agent-harness-workshop-lightweight). def _parse_frontmatter(text)"
+    },
+    "sym:app/backend/core/registries.py::_skill_md": {
+      "id": "sym:app/backend/core/registries.py::_skill_md",
+      "kind": "sym",
+      "text": "_skill_md in app/backend/core/registries.py (agent-harness-workshop-lightweight). def _skill_md(name, description, tools, body)"
+    },
+    "sym:app/backend/core/registries.py::author_materialized_view": {
+      "id": "sym:app/backend/core/registries.py::author_materialized_view",
+      "kind": "sym",
+      "text": "author_materialized_view in app/backend/core/registries.py (agent-harness-workshop-lightweight). def author_materialized_view(name, select_sql)"
+    },
+    "sym:app/backend/core/registries.py::automation_results": {
+      "id": "sym:app/backend/core/registries.py::automation_results",
+      "kind": "sym",
+      "text": "automation_results in app/backend/core/registries.py (agent-harness-workshop-lightweight). def automation_results(name, k)"
+    },
+    "sym:app/backend/core/registries.py::automation_status": {
+      "id": "sym:app/backend/core/registries.py::automation_status",
+      "kind": "sym",
+      "text": "automation_status in app/backend/core/registries.py (agent-harness-workshop-lightweight). def automation_status() doc: Automations joined with their live DBMS_SCHEDULER state (enabled, last/next run)."
+    },
+    "sym:app/backend/core/registries.py::build_skill_manifest": {
+      "id": "sym:app/backend/core/registries.py::build_skill_manifest",
+      "kind": "sym",
+      "text": "build_skill_manifest in app/backend/core/registries.py (agent-harness-workshop-lightweight). def build_skill_manifest(query, k)"
+    },
+    "sym:app/backend/core/registries.py::create_automation": {
+      "id": "sym:app/backend/core/registries.py::create_automation",
+      "kind": "sym",
+      "text": "create_automation in app/backend/core/registries.py (agent-harness-workshop-lightweight). def create_automation(name, select_sql, cadence_hours, description)"
+    },
+    "sym:app/backend/core/registries.py::get_tool_schema": {
+      "id": "sym:app/backend/core/registries.py::get_tool_schema",
+      "kind": "sym",
+      "text": "get_tool_schema in app/backend/core/registries.py (agent-harness-workshop-lightweight). def get_tool_schema(name)"
+    },
+    "sym:app/backend/core/registries.py::harvest_skills": {
+      "id": "sym:app/backend/core/registries.py::harvest_skills",
+      "kind": "sym",
+      "text": "harvest_skills in app/backend/core/registries.py (agent-harness-workshop-lightweight). def harvest_skills(min_occurrences, recency_days)"
+    },
+    "sym:app/backend/core/registries.py::list_automations": {
+      "id": "sym:app/backend/core/registries.py::list_automations",
+      "kind": "sym",
+      "text": "list_automations in app/backend/core/registries.py (agent-harness-workshop-lightweight). def list_automations()"
+    },
+    "sym:app/backend/core/registries.py::list_sources": {
+      "id": "sym:app/backend/core/registries.py::list_sources",
+      "kind": "sym",
+      "text": "list_sources in app/backend/core/registries.py (agent-harness-workshop-lightweight). def list_sources()"
+    },
+    "sym:app/backend/core/registries.py::load_skill": {
+      "id": "sym:app/backend/core/registries.py::load_skill",
+      "kind": "sym",
+      "text": "load_skill in app/backend/core/registries.py (agent-harness-workshop-lightweight). def load_skill(name)"
+    },
+    "sym:app/backend/core/registries.py::promote_file_to_memory": {
+      "id": "sym:app/backend/core/registries.py::promote_file_to_memory",
+      "kind": "sym",
+      "text": "promote_file_to_memory in app/backend/core/registries.py (agent-harness-workshop-lightweight). def promote_file_to_memory(path)"
+    },
+    "sym:app/backend/core/registries.py::promote_workflow_to_skill": {
+      "id": "sym:app/backend/core/registries.py::promote_workflow_to_skill",
+      "kind": "sym",
+      "text": "promote_workflow_to_skill in app/backend/core/registries.py (agent-harness-workshop-lightweight). def promote_workflow_to_skill(workflow_id)"
+    },
+    "sym:app/backend/core/registries.py::refresh_skills_from_source": {
+      "id": "sym:app/backend/core/registries.py::refresh_skills_from_source",
+      "kind": "sym",
+      "text": "refresh_skills_from_source in app/backend/core/registries.py (agent-harness-workshop-lightweight). def refresh_skills_from_source()"
+    },
+    "sym:app/backend/core/registries.py::register_default_tools": {
+      "id": "sym:app/backend/core/registries.py::register_default_tools",
+      "kind": "sym",
+      "text": "register_default_tools in app/backend/core/registries.py (agent-harness-workshop-lightweight). def register_default_tools()"
+    },
+    "sym:app/backend/core/registries.py::register_skill_from_source": {
+      "id": "sym:app/backend/core/registries.py::register_skill_from_source",
+      "kind": "sym",
+      "text": "register_skill_from_source in app/backend/core/registries.py (agent-harness-workshop-lightweight). def register_skill_from_source(src)"
+    },
+    "sym:app/backend/core/registries.py::register_tool": {
+      "id": "sym:app/backend/core/registries.py::register_tool",
+      "kind": "sym",
+      "text": "register_tool in app/backend/core/registries.py (agent-harness-workshop-lightweight). def register_tool(name, fn, description, params)"
+    },
+    "sym:app/backend/core/registries.py::retrieve_skills": {
+      "id": "sym:app/backend/core/registries.py::retrieve_skills",
+      "kind": "sym",
+      "text": "retrieve_skills in app/backend/core/registries.py (agent-harness-workshop-lightweight). def retrieve_skills(query, k)"
+    },
+    "sym:app/backend/core/registries.py::retrieve_tools": {
+      "id": "sym:app/backend/core/registries.py::retrieve_tools",
+      "kind": "sym",
+      "text": "retrieve_tools in app/backend/core/registries.py (agent-harness-workshop-lightweight). def retrieve_tools(query, k)"
+    },
+    "sym:app/backend/core/registries.py::run_automation_now": {
+      "id": "sym:app/backend/core/registries.py::run_automation_now",
+      "kind": "sym",
+      "text": "run_automation_now in app/backend/core/registries.py (agent-harness-workshop-lightweight). def run_automation_now(name) doc: Refresh the automation's materialized view now and return its latest rows."
+    },
+    "sym:app/backend/core/registries.py::run_sql": {
+      "id": "sym:app/backend/core/registries.py::run_sql",
+      "kind": "sym",
+      "text": "run_sql in app/backend/core/registries.py (agent-harness-workshop-lightweight). def run_sql(sql, max_rows)"
+    },
+    "sym:app/backend/core/registries.py::save_skill": {
+      "id": "sym:app/backend/core/registries.py::save_skill",
+      "kind": "sym",
+      "text": "save_skill in app/backend/core/registries.py (agent-harness-workshop-lightweight). def save_skill(name, description, skill_md, tools_used, source_workflow_id, source_url)"
+    },
+    "sym:app/backend/core/registries.py::seed_starter_skills": {
+      "id": "sym:app/backend/core/registries.py::seed_starter_skills",
+      "kind": "sym",
+      "text": "seed_starter_skills in app/backend/core/registries.py (agent-harness-workshop-lightweight). def seed_starter_skills()"
+    },
+    "sym:app/backend/core/registries.py::toggle_automation": {
+      "id": "sym:app/backend/core/registries.py::toggle_automation",
+      "kind": "sym",
+      "text": "toggle_automation in app/backend/core/registries.py (agent-harness-workshop-lightweight). def toggle_automation(name, enable) doc: Start (enable) or stop (disable) an automation's scheduled job."
+    },
+    "sym:app/backend/core/scratch.py::_abs": {
+      "id": "sym:app/backend/core/scratch.py::_abs",
+      "kind": "sym",
+      "text": "_abs in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def _abs(path)"
+    },
+    "sym:app/backend/core/scratch.py::exists": {
+      "id": "sym:app/backend/core/scratch.py::exists",
+      "kind": "sym",
+      "text": "exists in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def exists(path)"
+    },
+    "sym:app/backend/core/scratch.py::grep": {
+      "id": "sym:app/backend/core/scratch.py::grep",
+      "kind": "sym",
+      "text": "grep in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def grep(pattern, root)"
+    },
+    "sym:app/backend/core/scratch.py::listing": {
+      "id": "sym:app/backend/core/scratch.py::listing",
+      "kind": "sym",
+      "text": "listing in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def listing(root)"
+    },
+    "sym:app/backend/core/scratch.py::read": {
+      "id": "sym:app/backend/core/scratch.py::read",
+      "kind": "sym",
+      "text": "read in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def read(path)"
+    },
+    "sym:app/backend/core/scratch.py::read_range": {
+      "id": "sym:app/backend/core/scratch.py::read_range",
+      "kind": "sym",
+      "text": "read_range in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def read_range(path, start, end)"
+    },
+    "sym:app/backend/core/scratch.py::tail": {
+      "id": "sym:app/backend/core/scratch.py::tail",
+      "kind": "sym",
+      "text": "tail in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def tail(path, n)"
+    },
+    "sym:app/backend/core/scratch.py::write": {
+      "id": "sym:app/backend/core/scratch.py::write",
+      "kind": "sym",
+      "text": "write in app/backend/core/scratch.py (agent-harness-workshop-lightweight). def write(path, content)"
+    },
+    "sym:app/backend/core/sse.py::sse_response": {
+      "id": "sym:app/backend/core/sse.py::sse_response",
+      "kind": "sym",
+      "text": "sse_response in app/backend/core/sse.py (agent-harness-workshop-lightweight). def sse_response(events)"
+    },
+    "sym:app/backend/main.py::_warm": {
+      "id": "sym:app/backend/main.py::_warm",
+      "kind": "sym",
+      "text": "_warm in app/backend/main.py (agent-harness-workshop-lightweight). def _warm()"
+    },
+    "sym:app/backend/main.py::lifespan": {
+      "id": "sym:app/backend/main.py::lifespan",
+      "kind": "sym",
+      "text": "lifespan in app/backend/main.py (agent-harness-workshop-lightweight). def lifespan(app)"
+    },
+    "sym:app/backend/routers/agentloop.py::context_series": {
+      "id": "sym:app/backend/routers/agentloop.py::context_series",
+      "kind": "sym",
+      "text": "context_series in app/backend/routers/agentloop.py (agent-harness-workshop-lightweight). def context_series(turns, card_size, tool_blob) doc: The 'money shot' series: context size per turn, engineering OFF vs ON."
+    },
+    "sym:app/backend/routers/agentloop.py::run": {
+      "id": "sym:app/backend/routers/agentloop.py::run",
+      "kind": "sym",
+      "text": "run in app/backend/routers/agentloop.py (agent-harness-workshop-lightweight). def run(req)"
+    },
+    "sym:app/backend/routers/automations.py::CreateReq": {
+      "id": "sym:app/backend/routers/automations.py::CreateReq",
+      "kind": "sym",
+      "text": "CreateReq in app/backend/routers/automations.py (agent-harness-workshop-lightweight). class CreateReq"
+    },
+    "sym:app/backend/routers/automations.py::NameReq": {
+      "id": "sym:app/backend/routers/automations.py::NameReq",
+      "kind": "sym",
+      "text": "NameReq in app/backend/routers/automations.py (agent-harness-workshop-lightweight). class NameReq"
+    },
+    "sym:app/backend/routers/automations.py::ToggleReq": {
+      "id": "sym:app/backend/routers/automations.py::ToggleReq",
+      "kind": "sym",
+      "text": "ToggleReq in app/backend/routers/automations.py (agent-harness-workshop-lightweight). class ToggleReq"
+    },
+    "sym:app/backend/routers/automations.py::create": {
+      "id": "sym:app/backend/routers/automations.py::create",
+      "kind": "sym",
+      "text": "create in app/backend/routers/automations.py (agent-harness-workshop-lightweight). def create(req)"
+    },
+    "sym:app/backend/routers/automations.py::list_automations": {
+      "id": "sym:app/backend/routers/automations.py::list_automations",
+      "kind": "sym",
+      "text": "list_automations in app/backend/routers/automations.py (agent-harness-workshop-lightweight). def list_automations()"
+    },
+    "sym:app/backend/routers/automations.py::results": {
+      "id": "sym:app/backend/routers/automations.py::results",
+      "kind": "sym",
+      "text": "results in app/backend/routers/automations.py (agent-harness-workshop-lightweight). def results(name)"
+    },
+    "sym:app/backend/routers/automations.py::run": {
+      "id": "sym:app/backend/routers/automations.py::run",
+      "kind": "sym",
+      "text": "run in app/backend/routers/automations.py (agent-harness-workshop-lightweight). def run(req)"
+    },
+    "sym:app/backend/routers/automations.py::toggle": {
+      "id": "sym:app/backend/routers/automations.py::toggle",
+      "kind": "sym",
+      "text": "toggle in app/backend/routers/automations.py (agent-harness-workshop-lightweight). def toggle(req)"
+    },
+    "sym:app/backend/routers/layers.py::acid_demo": {
+      "id": "sym:app/backend/routers/layers.py::acid_demo",
+      "kind": "sym",
+      "text": "acid_demo in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def acid_demo() doc: Lost-update race: an OS file with no lock vs. an atomic DB UPDATE."
+    },
+    "sym:app/backend/routers/layers.py::embed": {
+      "id": "sym:app/backend/routers/layers.py::embed",
+      "kind": "sym",
+      "text": "embed in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def embed(req)"
+    },
+    "sym:app/backend/routers/layers.py::fs_list": {
+      "id": "sym:app/backend/routers/layers.py::fs_list",
+      "kind": "sym",
+      "text": "fs_list in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def fs_list(root)"
+    },
+    "sym:app/backend/routers/layers.py::fs_read": {
+      "id": "sym:app/backend/routers/layers.py::fs_read",
+      "kind": "sym",
+      "text": "fs_read in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def fs_read(path, mode, n, pattern)"
+    },
+    "sym:app/backend/routers/layers.py::fs_write": {
+      "id": "sym:app/backend/routers/layers.py::fs_write",
+      "kind": "sym",
+      "text": "fs_write in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def fs_write(req)"
+    },
+    "sym:app/backend/routers/layers.py::health": {
+      "id": "sym:app/backend/routers/layers.py::health",
+      "kind": "sym",
+      "text": "health in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def health()"
+    },
+    "sym:app/backend/routers/layers.py::models": {
+      "id": "sym:app/backend/routers/layers.py::models",
+      "kind": "sym",
+      "text": "models in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def models()"
+    },
+    "sym:app/backend/routers/layers.py::retrieval": {
+      "id": "sym:app/backend/routers/layers.py::retrieval",
+      "kind": "sym",
+      "text": "retrieval in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def retrieval(req)"
+    },
+    "sym:app/backend/routers/layers.py::semantic": {
+      "id": "sym:app/backend/routers/layers.py::semantic",
+      "kind": "sym",
+      "text": "semantic in app/backend/routers/layers.py (agent-harness-workshop-lightweight). def semantic(req)"
+    },
+    "sym:app/backend/routers/memory.py::card": {
+      "id": "sym:app/backend/routers/memory.py::card",
+      "kind": "sym",
+      "text": "card in app/backend/routers/memory.py (agent-harness-workshop-lightweight). def card(thread_id)"
+    },
+    "sym:app/backend/routers/memory.py::chat": {
+      "id": "sym:app/backend/routers/memory.py::chat",
+      "kind": "sym",
+      "text": "chat in app/backend/routers/memory.py (agent-harness-workshop-lightweight). def chat(req)"
+    },
+    "sym:app/backend/routers/memory.py::recall": {
+      "id": "sym:app/backend/routers/memory.py::recall",
+      "kind": "sym",
+      "text": "recall in app/backend/routers/memory.py (agent-harness-workshop-lightweight). def recall(req)"
+    },
+    "sym:app/backend/routers/memory.py::remember": {
+      "id": "sym:app/backend/routers/memory.py::remember",
+      "kind": "sym",
+      "text": "remember in app/backend/routers/memory.py (agent-harness-workshop-lightweight). def remember(req)"
+    },
+    "sym:app/backend/routers/memory.py::thread": {
+      "id": "sym:app/backend/routers/memory.py::thread",
+      "kind": "sym",
+      "text": "thread in app/backend/routers/memory.py (agent-harness-workshop-lightweight). def thread(thread_id)"
+    },
+    "sym:app/backend/routers/memory.py::threads": {
+      "id": "sym:app/backend/routers/memory.py::threads",
+      "kind": "sym",
+      "text": "threads in app/backend/routers/memory.py (agent-harness-workshop-lightweight). def threads(prefix)"
+    },
+    "sym:app/backend/routers/memory.py::turns": {
+      "id": "sym:app/backend/routers/memory.py::turns",
+      "kind": "sym",
+      "text": "turns in app/backend/routers/memory.py (agent-harness-workshop-lightweight). def turns(thread_id)"
+    },
+    "sym:app/backend/routers/skills.py::automations": {
+      "id": "sym:app/backend/routers/skills.py::automations",
+      "kind": "sym",
+      "text": "automations in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def automations()"
+    },
+    "sym:app/backend/routers/skills.py::create_automation": {
+      "id": "sym:app/backend/routers/skills.py::create_automation",
+      "kind": "sym",
+      "text": "create_automation in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def create_automation(req)"
+    },
+    "sym:app/backend/routers/skills.py::list_skills": {
+      "id": "sym:app/backend/routers/skills.py::list_skills",
+      "kind": "sym",
+      "text": "list_skills in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def list_skills()"
+    },
+    "sym:app/backend/routers/skills.py::load": {
+      "id": "sym:app/backend/routers/skills.py::load",
+      "kind": "sym",
+      "text": "load in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def load(name)"
+    },
+    "sym:app/backend/routers/skills.py::manifest": {
+      "id": "sym:app/backend/routers/skills.py::manifest",
+      "kind": "sym",
+      "text": "manifest in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def manifest(req)"
+    },
+    "sym:app/backend/routers/skills.py::promote": {
+      "id": "sym:app/backend/routers/skills.py::promote",
+      "kind": "sym",
+      "text": "promote in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def promote(req)"
+    },
+    "sym:app/backend/routers/skills.py::refresh": {
+      "id": "sym:app/backend/routers/skills.py::refresh",
+      "kind": "sym",
+      "text": "refresh in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def refresh()"
+    },
+    "sym:app/backend/routers/skills.py::register_source": {
+      "id": "sym:app/backend/routers/skills.py::register_source",
+      "kind": "sym",
+      "text": "register_source in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def register_source(req)"
+    },
+    "sym:app/backend/routers/skills.py::tools": {
+      "id": "sym:app/backend/routers/skills.py::tools",
+      "kind": "sym",
+      "text": "tools in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def tools(req)"
+    },
+    "sym:app/backend/routers/skills.py::workflows": {
+      "id": "sym:app/backend/routers/skills.py::workflows",
+      "kind": "sym",
+      "text": "workflows in app/backend/routers/skills.py (agent-harness-workshop-lightweight). def workflows()"
+    },
+    "sym:app/backend/schemas.py::AgentReq": {
+      "id": "sym:app/backend/schemas.py::AgentReq",
+      "kind": "sym",
+      "text": "AgentReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class AgentReq"
+    },
+    "sym:app/backend/schemas.py::AutomationReq": {
+      "id": "sym:app/backend/schemas.py::AutomationReq",
+      "kind": "sym",
+      "text": "AutomationReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class AutomationReq"
+    },
+    "sym:app/backend/schemas.py::ChatReq": {
+      "id": "sym:app/backend/schemas.py::ChatReq",
+      "kind": "sym",
+      "text": "ChatReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class ChatReq"
+    },
+    "sym:app/backend/schemas.py::EmbedReq": {
+      "id": "sym:app/backend/schemas.py::EmbedReq",
+      "kind": "sym",
+      "text": "EmbedReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class EmbedReq"
+    },
+    "sym:app/backend/schemas.py::FactReq": {
+      "id": "sym:app/backend/schemas.py::FactReq",
+      "kind": "sym",
+      "text": "FactReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class FactReq"
+    },
+    "sym:app/backend/schemas.py::PromoteReq": {
+      "id": "sym:app/backend/schemas.py::PromoteReq",
+      "kind": "sym",
+      "text": "PromoteReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class PromoteReq"
+    },
+    "sym:app/backend/schemas.py::SearchReq": {
+      "id": "sym:app/backend/schemas.py::SearchReq",
+      "kind": "sym",
+      "text": "SearchReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class SearchReq"
+    },
+    "sym:app/backend/schemas.py::SkillSourceReq": {
+      "id": "sym:app/backend/schemas.py::SkillSourceReq",
+      "kind": "sym",
+      "text": "SkillSourceReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class SkillSourceReq"
+    },
+    "sym:app/backend/schemas.py::ToolQuery": {
+      "id": "sym:app/backend/schemas.py::ToolQuery",
+      "kind": "sym",
+      "text": "ToolQuery in app/backend/schemas.py (agent-harness-workshop-lightweight). class ToolQuery"
+    },
+    "sym:app/backend/schemas.py::WriteReq": {
+      "id": "sym:app/backend/schemas.py::WriteReq",
+      "kind": "sym",
+      "text": "WriteReq in app/backend/schemas.py (agent-harness-workshop-lightweight). class WriteReq"
+    },
+    "sym:oci_key_rotation.py::KeyRotator": {
+      "id": "sym:oci_key_rotation.py::KeyRotator",
+      "kind": "sym",
+      "text": "KeyRotator in oci_key_rotation.py (agent-harness-workshop-lightweight). class KeyRotator"
+    },
+    "sym:oci_key_rotation.py::KeyRotator.__init__": {
+      "id": "sym:oci_key_rotation.py::KeyRotator.__init__",
+      "kind": "sym",
+      "text": "__init__ in oci_key_rotation.py (agent-harness-workshop-lightweight). def __init__(self, keys, seed)"
+    },
+    "sym:oci_key_rotation.py::KeyRotator.__len__": {
+      "id": "sym:oci_key_rotation.py::KeyRotator.__len__",
+      "kind": "sym",
+      "text": "__len__ in oci_key_rotation.py (agent-harness-workshop-lightweight). def __len__(self)"
+    },
+    "sym:oci_key_rotation.py::KeyRotator.advance": {
+      "id": "sym:oci_key_rotation.py::KeyRotator.advance",
+      "kind": "sym",
+      "text": "advance in oci_key_rotation.py (agent-harness-workshop-lightweight). def advance(self)"
+    },
+    "sym:oci_key_rotation.py::KeyRotator.current": {
+      "id": "sym:oci_key_rotation.py::KeyRotator.current",
+      "kind": "sym",
+      "text": "current in oci_key_rotation.py (agent-harness-workshop-lightweight). def current(self)"
+    },
+    "sym:oci_key_rotation.py::KeyRotator.current_index": {
+      "id": "sym:oci_key_rotation.py::KeyRotator.current_index",
+      "kind": "sym",
+      "text": "current_index in oci_key_rotation.py (agent-harness-workshop-lightweight). def current_index(self)"
+    },
+    "sym:oci_key_rotation.py::call_with_failover": {
+      "id": "sym:oci_key_rotation.py::call_with_failover",
+      "kind": "sym",
+      "text": "call_with_failover in oci_key_rotation.py (agent-harness-workshop-lightweight). def call_with_failover(make_client, do_call, rotator) doc: Retry a call across at most two sweeps of the configured keys."
+    },
+    "sym:oci_key_rotation.py::call_with_failover_async": {
+      "id": "sym:oci_key_rotation.py::call_with_failover_async",
+      "kind": "sym",
+      "text": "call_with_failover_async in oci_key_rotation.py (agent-harness-workshop-lightweight). def call_with_failover_async(make_client, do_call, rotator) doc: Async counterpart to :func:`call_with_failover`."
+    },
+    "sym:oci_key_rotation.py::is_rate_limit_error": {
+      "id": "sym:oci_key_rotation.py::is_rate_limit_error",
+      "kind": "sym",
+      "text": "is_rate_limit_error in oci_key_rotation.py (agent-harness-workshop-lightweight). def is_rate_limit_error(exc) doc: Return whether an exception is worth failing over to another key."
+    },
+    "sym:oci_key_rotation.py::load_oci_keys": {
+      "id": "sym:oci_key_rotation.py::load_oci_keys",
+      "kind": "sym",
+      "text": "load_oci_keys in oci_key_rotation.py (agent-harness-workshop-lightweight). def load_oci_keys() doc: Collect configured OCI keys in order, de-duplicated and sanitized."
+    },
+    "sym:oci_key_rotation.py::make_rotating_oamp_llm": {
+      "id": "sym:oci_key_rotation.py::make_rotating_oamp_llm",
+      "kind": "sym",
+      "text": "make_rotating_oamp_llm in oci_key_rotation.py (agent-harness-workshop-lightweight). def make_rotating_oamp_llm(model, endpoint, rotator) doc: Build an OAMP-compatible LLM wrapper that rotates OCI keys on failure."
+    },
+    "sym:scripts/build_student_notebook.py::load": {
+      "id": "sym:scripts/build_student_notebook.py::load",
+      "kind": "sym",
+      "text": "load in scripts/build_student_notebook.py (agent-harness-workshop-lightweight). def load(path)"
+    },
+    "sym:scripts/build_student_notebook.py::main": {
+      "id": "sym:scripts/build_student_notebook.py::main",
+      "kind": "sym",
+      "text": "main in scripts/build_student_notebook.py (agent-harness-workshop-lightweight). def main()"
+    },
+    "sym:scripts/build_student_notebook.py::sources": {
+      "id": "sym:scripts/build_student_notebook.py::sources",
+      "kind": "sym",
+      "text": "sources in scripts/build_student_notebook.py (agent-harness-workshop-lightweight). def sources(notebook)"
+    },
+    "sym:scripts/seed_oracle.py::connect_with_retry": {
+      "id": "sym:scripts/seed_oracle.py::connect_with_retry",
+      "kind": "sym",
+      "text": "connect_with_retry in scripts/seed_oracle.py (agent-harness-workshop-lightweight). def connect_with_retry(user, password, dsn, mode, attempts, base_delay) doc: Connect, retrying while the database warms up (it can take a minute on first boot)."
+    },
+    "sym:scripts/seed_oracle.py::ddl_idempotent": {
+      "id": "sym:scripts/seed_oracle.py::ddl_idempotent",
+      "kind": "sym",
+      "text": "ddl_idempotent in scripts/seed_oracle.py (agent-harness-workshop-lightweight). def ddl_idempotent(conn, sql) doc: Run CREATE/DROP/GRANT DDL, swallowing the 'already exists' family of errors."
+    },
+    "sym:scripts/seed_oracle.py::ensure_model_file": {
+      "id": "sym:scripts/seed_oracle.py::ensure_model_file",
+      "kind": "sym",
+      "text": "ensure_model_file in scripts/seed_oracle.py (agent-harness-workshop-lightweight). def ensure_model_file(local_path, url) doc: Prefer a local cache; download from the bucket only if missing or truncated."
+    },
+    "sym:scripts/seed_oracle.py::is_model_loaded": {
+      "id": "sym:scripts/seed_oracle.py::is_model_loaded",
+      "kind": "sym",
+      "text": "is_model_loaded in scripts/seed_oracle.py (agent-harness-workshop-lightweight). def is_model_loaded(conn, model_name)"
+    },
+    "sym:scripts/seed_oracle.py::load_onnx_model": {
+      "id": "sym:scripts/seed_oracle.py::load_onnx_model",
+      "kind": "sym",
+      "text": "load_onnx_model in scripts/seed_oracle.py (agent-harness-workshop-lightweight). def load_onnx_model(conn, model_name, onnx_path, metadata)"
+    },
+    "sym:scripts/seed_oracle.py::main": {
+      "id": "sym:scripts/seed_oracle.py::main",
+      "kind": "sym",
+      "text": "main in scripts/seed_oracle.py (agent-harness-workshop-lightweight). def main()"
+    },
+    "sym:scripts/seed_oracle.py::package_present": {
+      "id": "sym:scripts/seed_oracle.py::package_present",
+      "kind": "sym",
+      "text": "package_present in scripts/seed_oracle.py (agent-harness-workshop-lightweight). def package_present(conn, name) doc: Whether the database ships a package/synonym (gates the optional grants above)."
+    }
+  }
+}

@@ -115,9 +115,11 @@ If you see `DATABASE IS READY TO USE!`, Oracle is up. The pre-built `connect()` 
 
 **Symptom:** The Codespace is stuck on the loading screen.
 
-**Cause:** First-time Oracle Free image initialisation can take 3-5 minutes. After that, `postCreateCommand` runs the build script.
+**Cause:** First-time Oracle Free image initialisation used to take 3-5 minutes, because the
+`:latest` image builds the database on first start. The container now uses the **`:latest-lite`**
+image, which ships a pre-built database and is ready in about 30 seconds.
 
-**Fix:** This is expected. Do not refresh. Wait for the terminal prompt. If it exceeds 10 minutes:
+**Fix:** Normally under a minute once the image is in the Docker cache. If it still stalls:
 
 ```bash
 docker compose -f .devcontainer/docker-compose.yml logs --tail=20 oracle
@@ -192,22 +194,68 @@ the Codespace) for a change to stick.
 
 ### Restarting, rebuilding, or creating a new Codespace
 
-The Oracle database lives in a **named volume**, so it survives container restarts. Because the
-image changed to 26ai Free, a volume created by the previous image must be recreated **once**:
+Nothing manual is needed. The database lives in the **`oracle-data-26ai`** volume: a volume created
+by a different image cannot be opened by this one, so the name change means an old volume is simply
+ignored and a fresh, compatible one is created on the next start. `postCreate.sh` provisions it (AGENT
+schema + in-database ONNX embedder) and `start-app.sh` re-checks and re-provisions on **every** start,
+so an empty or partially-built volume self-heals instead of leaving the app stuck on "warming…".
+
+If the disk is tight (a Codespace has ~32 GB), reclaim the leftovers — the old data volume and,
+if you ever pulled it, the 14 GB `:latest` image:
 
 ```bash
-docker compose -f .devcontainer/docker-compose.yml down -v   # then rebuild/restart the container
+docker volume prune       # drops the unused oracle-data volume from the old image
+docker image prune -a     # drops images no container references (incl. database/free:latest)
 ```
 
-The workshop's own demo data reseeds itself; skills, workflows and automations you created in that
-volume are lost with it. `postCreate.sh` provisions the database (AGENT schema + in-database ONNX
-embedder) and `start-app.sh` re-checks and re-provisions it on **every** start, so an empty or
-partially-built volume self-heals instead of leaving the app stuck on "warming…".
-
-A brand-new Codespace needs nothing extra: `postCreate` installs the app dependencies, downloads
-the embedder (127 MB) and provisions the schema, then `start-app.sh` starts the appbook — which is
-why the port-8000 preview opens on its own. Set `OCI_GENAI_API_KEY` as a Codespaces secret *before*
+A brand-new Codespace needs nothing extra: `onCreate.sh` installs the app dependencies and
+downloads the embedder (127 MB) — both of which a Codespaces **prebuild** can snapshot ahead of
+time — then `postCreate` provisions the schema and `start-app.sh` starts the appbook, which is why
+the port-8000 preview opens on its own. Set `OCI_GENAI_API_KEY` as a Codespaces secret *before*
 creating it; without one the appbook still serves, but chat and the agent loop stay disabled.
+
+### Codespace is "running in recovery mode due to a container error"
+
+**Symptom:** The Codespace refuses to open, offering only "Codespaces: View Creation Log" and
+"Rebuild Container".
+
+**Cause:** Two things used to make this possible, both now fixed in `.devcontainer/`:
+
+1. The database service was declared as `condition: service_healthy`, so if Oracle never reported
+   healthy the `app` container was never started and the dev container failed to come up.
+2. The database volume could not be opened (it was initialised by a different Oracle image), which
+   kept Oracle unhealthy — which then triggered cause 1.
+
+**Fix:** Rebuild the container (Cmd/Ctrl+Shift+P → "Codespaces: Rebuild Container"). The config now
+uses `condition: service_started`, so the app container always starts and simply reports the database
+state in `/api/health` instead of blocking the Codespace, and it mounts the fresh `oracle-data-26ai`
+volume, so an incompatible volume is left unused rather than mounted.
+
+If it still fails, the creation log is the source of truth (`Codespaces: View Creation Log`). A
+failed **image pull** reads as `unauthorized: authentication required`; a failed **disk** as
+`no space left on device` — prune as shown above and rebuild.
+
+### `ORA-43853: ... cannot be used in non-automatic segment space management`
+
+**Symptom:** Layer 3/5 return 500 and `/api/health` shows an `ORA-43853` harness error, while
+Layer 1 (embeddings) works.
+
+**Cause:** JSON columns, SecureFile LOBs and `VECTOR` columns may only live in a tablespace with
+**automatic** segment space management (ASSM). The Free **lite** image ships a pre-built PDB whose
+default permanent tablespace is `SYSTEM` (MANUAL) and which has no `USERS` tablespace, so a schema
+created without an explicit tablespace cannot hold the harness's tables at all. The full `:latest`
+image creates ASSM `USERS` when it builds the database on first start, which is why the same code
+worked there.
+
+**Fix:** Applied — `scripts/seed_oracle.py` now creates the ASSM `USERS` tablespace if it is missing
+and points `AGENT` at it explicitly (idempotent, and it repairs schemas created before the fix).
+Re-run it, or apply it by hand as SYSDBA in `FREEPDB1`:
+
+```sql
+CREATE TABLESPACE USERS DATAFILE '<pdb-datafile-dir>/users01.dbf' SIZE 100M REUSE
+  AUTOEXTEND ON NEXT 100M MAXSIZE 4G SEGMENT SPACE MANAGEMENT AUTO;   -- REUSE must follow SIZE
+ALTER USER AGENT DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS;
+```
 
 ## OAMP / Memory Issues
 

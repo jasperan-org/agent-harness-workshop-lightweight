@@ -66,10 +66,22 @@ OPTIONAL_GRANTS = [
 ]
 
 # 'already exists' / 'does not exist' family — safe to swallow so the script is idempotent.
-_IGNORE = ("ORA-00955", "ORA-01920", "ORA-00942", "ORA-01430", "ORA-02260", "ORA-00001")
+_IGNORE = (
+    "ORA-00955",
+    "ORA-01920",
+    "ORA-01918",
+    "ORA-00942",
+    "ORA-01430",
+    "ORA-02260",
+    "ORA-00001",
+    "ORA-01543",
+)
+
+# Where the harness's tables live. Explicit, because an implicit default is image-dependent.
+AGENT_TABLESPACE = os.environ.get("ORA_AGENT_TABLESPACE", "USERS")
 
 
-def connect_with_retry(user, password, dsn, mode=None, attempts=30, base_delay=5.0):
+def connect_with_retry(user, password, dsn, mode=None, attempts=60, base_delay=5.0):
     """Connect, retrying while the database warms up (it can take a minute on first boot)."""
     last = None
     for i in range(1, attempts + 1):
@@ -96,6 +108,60 @@ def ddl_idempotent(conn, sql):
         raise
     finally:
         cur.close()
+
+
+def ensure_agent_tablespace(admin, name=AGENT_TABLESPACE, size="100M"):
+    """Create the AGENT schema's ASSM tablespace when the image doesn't already have one.
+
+    The Free **lite** image ships a *pre-built* PDB whose default permanent tablespace is SYSTEM —
+    MANUAL segment space management — and it has no USERS tablespace at all. JSON columns,
+    SecureFile LOBs and VECTOR columns are illegal there, so every table the harness creates failed
+    with `ORA-43853: ... cannot be used in non-automatic segment space management tablespace
+    "SYSTEM"`. The full image builds the database on first start, gets an ASSM USERS tablespace,
+    and defaults to it — the same code simply worked there by luck.
+
+    Creating it explicitly (and pointing AGENT at it) makes both images behave identically and
+    repairs volumes provisioned before this fix. Idempotent.
+    """
+    cur = admin.cursor()
+    try:
+        cur.execute("SELECT COUNT(*) FROM dba_tablespaces WHERE tablespace_name = :n", {"n": name})
+        if cur.fetchone()[0]:
+            return
+        # OMF (db_create_file_dest) lets the database generate the datafile name. The lite image
+        # ships the PDB with OMF unset, so name the file explicitly next to the PDB's datafiles.
+        cur.execute("SELECT value FROM v$parameter WHERE name = 'db_create_file_dest'")
+        row = cur.fetchone()
+        if row and row[0]:
+            datafile, reuse = "", ""
+        else:
+            directory = _datafile_dir(cur)
+            if not directory:
+                print(f"  note: no db_create_file_dest and no datafile directory — skipping {name}")
+                return
+            # REUSE must follow SIZE (before it: ORA-02180).
+            datafile, reuse = f"'{directory}/{name.lower()}01.dbf' ", "REUSE "
+        cur.execute(
+            f"CREATE TABLESPACE {name} DATAFILE {datafile}SIZE {size} {reuse}"
+            "AUTOEXTEND ON NEXT 100M MAXSIZE 4G SEGMENT SPACE MANAGEMENT AUTO"
+        )
+        admin.commit()
+        print(f"  created ASSM tablespace {name} (JSON / SecureFile / VECTOR columns require it)")
+    except Exception as e:  # noqa: BLE001
+        admin.rollback()
+        # Never fatal: if the tablespace cannot be created the DDL failures surface with a clear
+        # ORA-43853, and the appbook reports it in /api/health instead of dying here.
+        if not any(code in str(e) for code in _IGNORE):
+            print(f"  note: could not create tablespace {name}: {str(e).splitlines()[0]}")
+    finally:
+        cur.close()
+
+
+def _datafile_dir(cur):
+    """Directory holding an existing datafile of the current container — used for explicit paths."""
+    cur.execute("SELECT name FROM v$datafile WHERE name LIKE '%/system%' AND ROWNUM = 1")
+    row = cur.fetchone()
+    return str(pathlib.PurePosixPath(row[0]).parent) if row else ""
 
 
 def is_model_loaded(conn, model_name):
@@ -166,7 +232,18 @@ def main():
     # 1) Create the AGENT user and apply the grants (as SYSDBA, in FREEPDB1).
     admin = connect_with_retry(ADMIN_USER, ADMIN_PWD, DSN, mode=oracledb.AUTH_MODE_SYSDBA)
     print(f"  admin connected — DB version {admin.version}")
-    ddl_idempotent(admin, f'CREATE USER {AGENT} IDENTIFIED BY "{AGENT_PWD}"')
+    ensure_agent_tablespace(admin)
+    ddl_idempotent(
+        admin,
+        f'CREATE USER {AGENT} IDENTIFIED BY "{AGENT_PWD}" DEFAULT TABLESPACE {AGENT_TABLESPACE}',
+    )
+    # Idempotent repair for schemas created before the tablespace was made explicit (e.g. an older
+    # volume whose AGENT still defaults to SYSTEM). Without this, existing codespaces stay broken.
+    ddl_idempotent(
+        admin,
+        f"ALTER USER {AGENT} DEFAULT TABLESPACE {AGENT_TABLESPACE} "
+        f"QUOTA UNLIMITED ON {AGENT_TABLESPACE}",
+    )
     for g in GRANTS:
         ddl_idempotent(admin, g.format(a=AGENT))
     print(f"  user {AGENT} ready ({len(GRANTS)} grants applied idempotently)")
