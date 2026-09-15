@@ -1,19 +1,40 @@
-> **Advanced reference:** This is an advanced reference for the original self-contained notebook. The current lightweight AppBook uses an `agent_scratch` SecureFile LOB table for scratch content; it does not require Oracle DBFS or add another canonical TODO.
+> **Advanced reference:** This is an advanced reference for the original self-contained workshop build. The current lightweight AppBook uses an `agent_scratch` SecureFile LOB table for scratch content; it does not require Oracle DBFS or add another canonical TODO.
 
 # Part 4: DBFS Scratchpad
 
 [Oracle DBFS (Database File System)](https://docs.oracle.com/en/database/oracle/oracle-database/26/adlob/database-filesystem-DBFS-intro.html) is a POSIX-like filesystem layered on SecureFile LOBs in a table. The agent sees files and directories; the database sees rows. Same backups, same audit, same security model as everything else in the harness — but with `open()`/`read()`/`write()` ergonomics.
 
-## What's pre-built
+## What you need to provision
 
-The Codespace ran the self-contained setup cells in `enterprise_data_agent.ipynb`, which provisions:
+DBFS is **not** part of the default Codespace bootstrap — `scripts/seed_oracle.py` provisions the schema, vector pool, ONNX models and memory tables only. To work through this Part, run this once as an admin connection (every statement is skippable if the object already exists):
 
-- A tablespace `AGENT_DBFS_TS` with a dedicated datafile.
-- A DBFS store `AGENT_SCRATCH` (`DBMS_DBFS_SFS.CREATEFILESYSTEM` + `DBMS_DBFS_CONTENT.REGISTERSTORE`).
-- A mount at `/scratch` (`DBMS_DBFS_CONTENT.MOUNTSTORE`).
-- All required grants (`EXECUTE ON DBMS_DBFS_CONTENT`, `EXECUTE ON DBMS_DBFS_SFS`, `DBFS_ROLE`).
+```sql
+-- 1. tablespace. `DATAFILE SIZE …` (no path) needs DB_CREATE_FILE_DEST/OMF, which the Free image
+--    usually leaves unset — so name the file. <datafile_dir> comes from
+--    SELECT name FROM v$datafile WHERE rownum = 1  (typically .../oradata/FREEPDB1/).
+CREATE TABLESPACE AGENT_DBFS_TS
+  DATAFILE '<datafile_dir>/agent_dbfs01.dbf' SIZE 100M AUTOEXTEND ON NEXT 50M MAXSIZE 2G;
+ALTER USER AGENT QUOTA UNLIMITED ON AGENT_DBFS_TS;
 
-You don't run any DDL in this Part. The notebook just wraps the PL/SQL `PUTPATH` / `GETPATH` calls behind a Python class so the rest of the harness can use `read` / `write` / `append` semantics.
+-- 2. store + mount
+BEGIN
+  DBMS_DBFS_SFS.CREATEFILESYSTEM(store_name => 'AGENT_SCRATCH', tbl_name => 'AGENT_SCRATCH_T',
+                                 tbl_tbs => 'AGENT_DBFS_TS', use_bf => FALSE);
+  DBMS_DBFS_CONTENT.REGISTERSTORE(store_name => 'AGENT_SCRATCH', provider_name => 'sample1',
+                                  provider_package => 'DBMS_DBFS_SFS');
+  DBMS_DBFS_CONTENT.MOUNTSTORE(store_name => 'AGENT_SCRATCH', store_mount => 'scratch');
+END;
+/
+
+-- 3. grants
+GRANT EXECUTE ON DBMS_DBFS_CONTENT TO AGENT;
+GRANT EXECUTE ON DBMS_DBFS_SFS TO AGENT;
+GRANT DBFS_ROLE TO AGENT;
+```
+
+The three PL/SQL calls are re-runnable: `ORA-00955`, `ORA-64007`, `ORA-64008` and the unique-constraint error on `DBFS$_STORES`/`DBFS$_MOUNTS` all just mean "already there".
+
+Once the store is mounted, the notebook wraps the PL/SQL `PUTPATH` / `GETPATH` calls behind a Python class so the rest of the harness can use `read` / `write` / `append` semantics.
 
 ## Why a filesystem at all?
 
@@ -59,6 +80,6 @@ No separate filesystem to secure.
 
 **`ORA-64001: path not found`** — File doesn't exist. Either `scratch.write` it first or catch `FileNotFoundError`.
 
-**`ORA-22288: file or LOB operation FILEOPEN failed`** — The DBFS store isn't mounted. Re-run the self-contained setup cells in `enterprise_data_agent.ipynb`.
+**`ORA-22288: file or LOB operation FILEOPEN failed`** — The DBFS store isn't mounted. Mount the store — step 2 of *What you need to provision* above.
 
 **`PLS-00306: wrong number or types of arguments in call to PUTPATH`** — Wrong Oracle DBFS version. Ensure you're on Oracle 23ai / 26ai.

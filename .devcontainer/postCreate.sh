@@ -22,5 +22,5 @@ cat <<'EOF'
   • App log:        /tmp/total-recall-app.log
   • Build the harness yourself:  notebook_student.ipynb   (answer key: notebook_complete.ipynb)
   • Core guides:  docs/part-1-setup.md … docs/part-7-agent-loop.md
-  • Advanced reference:  enterprise_data_agent.ipynb, plus docs/part-4-dbfs.md, docs/part-5-mle.md, docs/part-9-duality-views.md, docs/part-11-tool-output-offload.md
+  • Advanced reference:  docs/part-4-dbfs.md, docs/part-5-mle.md, docs/part-9-duality-views.md, docs/part-11-tool-output-offload.md
 EOF

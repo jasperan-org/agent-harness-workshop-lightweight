@@ -1,4 +1,4 @@
-> **Advanced reference:** This is an advanced reference for the original self-contained notebook. JSON Relational Duality Views are not required by the current five-TODO notebook or AppBook path.
+> **Advanced reference:** This is an advanced reference for the original self-contained workshop build. JSON Relational Duality Views are not required by the current five-TODO notebook or AppBook path.
 
 # Part 9: JSON Relational Duality Views
 

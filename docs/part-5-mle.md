@@ -1,4 +1,4 @@
-> **Advanced reference:** This is an advanced reference for the original self-contained notebook. Oracle MLE is not required by the current five-TODO notebook or AppBook path.
+> **Advanced reference:** This is an advanced reference for the original self-contained workshop build. Oracle MLE is not required by the current five-TODO notebook or AppBook path.
 
 # Part 5: Oracle MLE Compute Sandbox
 
@@ -17,11 +17,17 @@ Oracle AI Database 26ai Free ships MLE with JavaScript. Python MLE is a separate
 
 ## What's pre-built
 
-Nothing in Oracle itself — MLE is available out of the box on Oracle AI Database 26ai with the grants the self-contained setup cells in `enterprise_data_agent.ipynb` already gave to `AGENT`:
+Nothing in Oracle itself — MLE is available out of the box on Oracle AI Database 26ai with grants your `AGENT` user needs to have. The default Codespace bootstrap grants only `CREATE MINING MODEL` (`scripts/seed_oracle.py`), so run these once as an admin:
 
 - `EXECUTE ON DBMS_MLE`
 - `EXECUTE DYNAMIC MLE`
 - `DB_DEVELOPER_ROLE`
+
+```sql
+GRANT EXECUTE ON DBMS_MLE TO AGENT;
+GRANT EXECUTE DYNAMIC MLE TO AGENT;
+GRANT DB_DEVELOPER_ROLE TO AGENT;
+```
 
 This Part just defines the Python helper that calls `DBMS_MLE.EVAL` for us.
 

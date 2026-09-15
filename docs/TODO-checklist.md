@@ -22,4 +22,4 @@ The canonical workshop is the five-TODO path in `notebook_student.ipynb`. Each c
 - [ ] Check the Foundation, Retrieval, Memory, Semantic Layer, Agent Loop, and Mission Control chapters.
 - [ ] Try a retail question such as “How many paid orders does each sales channel have?”
 
-`enterprise_data_agent.ipynb` and Parts 4/5/9/11 are advanced reference material for the original supply-chain/Oracle-capabilities version. They are not additional required TODOs in the lightweight workshop.
+Parts 4/5/9/11 are advanced reference material for the original supply-chain/Oracle-capabilities version. They are not additional required TODOs in the lightweight workshop.

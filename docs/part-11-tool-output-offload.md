@@ -1,4 +1,4 @@
-> **Advanced reference:** This is an advanced reference for the original self-contained notebook. Tool-output offload is not required by the current five-TODO notebook or AppBook path.
+> **Advanced reference:** This is an advanced reference for the original self-contained workshop build. Tool-output offload is not required by the current five-TODO notebook or AppBook path.
 
 # Part 11: Tool-Output Offload
 
