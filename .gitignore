@@ -63,3 +63,7 @@ dist/
 keys.txt
 # Code-knowledge-graph cache (tool artifact, regenerated on demand)
 .ckg/
+
+# Agent-tooling artifacts (generated locally per agent session, not shared)
+AGENTS.md
+excalidraw.log
