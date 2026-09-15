@@ -92,7 +92,9 @@ where $r_{\text{vec}}$ and $r_{\text{text}}$ are 1-based ranks from each retriev
 
 RRF doesn't care about absolute scores from each retriever — only the relative ranks — so it's robust to whatever scoring scheme each side uses.
 
-Two prerequisites — both already in this Oracle:
+Two prerequisites. The ONNX embedder lives in the database image, and the notebook creates the
+`CTXSYS.CONTEXT` index it needs in §3.3a (it is idempotent), so both are in place by the time this
+cell runs:
 
 | Side | What we use |
 |---|---|
@@ -148,7 +150,7 @@ def hybrid_rrf_search_memories(query, k=5, per_list=30, rrf_k=60):
          FETCH FIRST :k ROWS ONLY
     """
     with agent_conn.cursor() as cur:
-        kw = f'"{query}"' if " " in query.strip() else query
+        kw = _text_query(query)   # {term} OR {term} … (§3.3) — never the raw sentence
         cur.execute(sql, q=query, kw=kw, u=USER_ID, a=AGENT_ID,
                     n=per_list, rrf_k=rrf_k, k=k)
         rows = []
@@ -215,6 +217,11 @@ Watch the `r_vec` / `r_txt` columns: a row whose `r_vec` is low (top of vector l
 
 **`AttributeError: 'NoneType' object has no attribute 'metadata'`** — `memory_client.search` returned no hits. Run the scan cell first to populate the store.
 
-**`ORA-29855: error occurred in the execution of ODCIINDEXCREATE`** — The `CTXSYS.CONTEXT` index needs the `CTXAPP` role. The setup cell grants it; if you're running outside the Codespace, `GRANT CTXAPP TO AGENT` as `SYSDBA`.
+**`ORA-29855: error occurred in the execution of ODCIINDEXCREATE`** — on some images creating a `CTXSYS.CONTEXT` index needs the `CTXAPP` role. The notebook creates the index in §3.3a and `scripts/seed_oracle.py` grants `EXECUTE ON CTX_DDL`; on a stricter image, `GRANT CTXAPP TO AGENT` as `SYSDBA` and re-run §3.3a.
 
-**Hybrid query returns nothing** — Phrase-quote multi-word queries: `kw = f'"{query}"'` if the query has spaces. Otherwise Oracle Text parses it as a boolean expression and may match nothing.
+**Hybrid or keyword query returns nothing** — `CONTAINS()` takes an Oracle Text *expression*, and a plain
+multi-word string is parsed as a **phrase** — `order item discount percentage` means those four words
+adjacent, in that order, so almost nothing matches (quoting it makes the phrase explicit, which is
+worse, not better). Join the terms with an operator instead: `{term} OR {term} …`, which is what the
+notebook's `_text_query()` (§3.3) does. If the leg is empty *after* that, the index is missing —
+`DRG-10599: column is not indexed` means §3.3a has not run against this database yet.

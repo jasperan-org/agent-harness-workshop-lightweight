@@ -19,7 +19,7 @@ The canonical notebook keeps a small core set available — `run_sql`, `search_k
 
 ## The `@register` Decorator
 
-Pre-built. Read it before doing the TODO. The decorator is **argument-less** — `@register` introspects the function and writes both the in-memory entry and the `toolbox` row.
+§4.1a creates the `toolbox`/`skillbox` tables (idempotent) before this cell runs, so read it before doing the TODO. The decorator is **argument-less** — `@register` introspects the function and writes both the in-memory entry and the `toolbox` row.
 
 ```python
 def register(fn):
@@ -137,7 +137,7 @@ Two procedural-memory tables, parallel structures:
 
 **Source: [`oracle/skills/db`](https://github.com/oracle/skills/tree/main/db).** Oracle publishes a curated library — 100+ guides organized by category (`agent`, `performance`, `security`, `plsql`, `sqlcl`, …). Each `.md` file is a skill: an H1 title, a first-paragraph description, and a body of prose + SQL examples.
 
-The pre-built ingestion cell mirrors them into `skillbox` with their content SHA so re-ingestion is idempotent. `~155 skills × ~5 KB → 15 KB per turn` if we always-injected — far too much. Instead:
+§4.2's ingestion cell mirrors every `db/<category>/<skill>.md` from [oracle/skills](https://github.com/oracle/skills) into `skillbox`, keyed by content SHA so re-ingestion is idempotent. `~155 skills × ~5 KB → 15 KB per turn` if we always-injected — far too much. Instead:
 
 - The **manifest** (top-3 skill names + descriptions, ~200 tokens) is prepended to every prompt by `build_skill_manifest`.
 - The **full body** is one `load_skill(name)` tool call away.
