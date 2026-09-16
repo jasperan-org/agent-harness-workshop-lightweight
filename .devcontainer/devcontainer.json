@@ -8,6 +8,13 @@
     "memory": "16gb",
     "storage": "32gb"
   },
+  // An SSH server in the container is what makes `gh codespace ssh` (and `gh codespace cp`) work.
+  // Without it, a Codespace whose app or database wedged can only be repaired from the browser
+  // terminal, which is the manual step this dev container exists to avoid. It also lets the
+  // maintainer inspect a user's Codespace directly when a report cannot be reproduced locally.
+  "features": {
+    "ghcr.io/devcontainers/features/sshd:1": {}
+  },
   "forwardPorts": [8000, 8888],
   "portsAttributes": {
     "8000": { "label": "Total Recall appbook", "onAutoForward": "openPreview" },

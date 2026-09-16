@@ -210,6 +210,32 @@ pkill -f "uvicorn backend.main:app" ; bash .devcontainer/start-app.sh
 `scripts/write_app_env.sh`, so change `LLM_MODEL` in `.devcontainer/docker-compose.yml` (or restart
 the Codespace) for a change to stick.
 
+### The badge stays amber: `harness.ready` is false and `harness.error` names a database problem
+
+**Symptom:** the appbook serves, but `/api/health` reports `"ready": false` with an error such as
+`ORA-01017: invalid credential or not authorized; logon denied`, so every semantic, retrieval and
+memory route fails.
+
+**Cause:** the app warmed while the database was still being provisioned (a first boot bounces the
+instance once, to allocate the vector pool) or before `seed_oracle.py` converged the `AGENT`
+credential. Two things used to require a human: `_warm()` gave up after ~5 minutes, and
+`start-app.sh` treated any HTTP 200 from `/api/health` as "already running" — so a wedged process
+survived every later repair and kept its import-time credentials.
+
+**Fix:** automatic now. `_warm()` retries until the harness is ready, `start-app.sh` restarts a
+running app whose payload is not ready, and `seed_oracle.py` retries transient first-boot
+interruptions instead of leaving the schema unprovisioned. If you are on an older revision, pull
+the current one and run:
+
+```bash
+python scripts/seed_oracle.py        # converges the AGENT password + loads the embedder
+pkill -f "uvicorn backend.main:app" ; bash .devcontainer/start-app.sh
+```
+
+If the seed reports that no admin credential worked, that volume was initialised with a different
+`ORACLE_PWD`; recreate it (`docker compose -f .devcontainer/docker-compose.yml down -v`, then the
+two commands above) — no SQL repairs it.
+
 ### Restarting, rebuilding, or creating a new Codespace
 
 Nothing manual is needed. The database lives in the **`oracle-data-26ai`** volume: a volume created

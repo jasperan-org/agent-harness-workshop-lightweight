@@ -49,9 +49,24 @@ fi
 
 cd "$HERE/../app" || exit 0
 
-if curl -sf -o /dev/null http://127.0.0.1:8000/api/health 2>/dev/null; then
-  echo "▸ Appbook already running on port 8000."
-  exit 0
+# Health answers 200 even while the harness is warming (the SPA must serve immediately), so the
+# status code alone says nothing. A *running* appbook is only reusable when its payload says
+# harness.ready: a process that warmed before the database was provisioned holds the DSN and
+# credentials it imported, and those are the pair that failed; it can never converge on its own and
+# would serve a red badge forever. Restart it here: the new process imports the app/.env written
+# above and warms against the database the seed above just converged.
+health_json="$(curl -sf --max-time 5 http://127.0.0.1:8000/api/health 2>/dev/null || true)"
+if [ -n "$health_json" ]; then
+  if printf '%s' "$health_json" | python -c 'import json,sys; sys.exit(0 if json.load(sys.stdin).get("harness",{}).get("ready") else 1)' 2>/dev/null; then
+    echo "▸ Appbook already running on port 8000 (harness ready)."
+    exit 0
+  fi
+  echo "▸ Appbook is running but its harness is not ready; restarting it with the current config…"
+  pkill -f "uvicorn backend.main:app" 2>/dev/null || true
+  for _ in $(seq 1 10); do
+    curl -sf -o /dev/null --max-time 2 http://127.0.0.1:8000/api/health 2>/dev/null || break
+    sleep 1
+  done
 fi
 
 # Launch fully detached so the server survives this lifecycle hook exiting.
@@ -67,7 +82,7 @@ for _ in $(seq 1 25); do
   sleep 1
   if curl -sf -o /dev/null http://127.0.0.1:8000/api/health 2>/dev/null; then
     echo "✓ Appbook is up on port 8000 — the preview will open."
-    echo "  (The harness warms in a background thread; the status badge turns green once the DB is ready.)"
+    echo "  (The harness warms in a background thread and retries until Oracle is ready, so the badge turns green on its own.)"
     exit 0
   fi
 done

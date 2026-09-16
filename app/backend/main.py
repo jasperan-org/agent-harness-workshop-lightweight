@@ -23,16 +23,23 @@ from backend.routers import agentloop, automations, layers, memory, skills
 
 
 def _warm():
-    # Oracle can report healthy before the listener accepts application sessions. Retry a
-    # bounded number of times so a normal startup race does not strand the app at "warming".
-    for attempt in range(1, 31):
+    # Oracle can report healthy before the listener accepts application sessions, and on a fresh
+    # Codespace the lifecycle hooks may still be converging the AGENT credentials. Retry until the
+    # harness is up. A bounded loop used to give up after ~5 minutes, and the process then kept its
+    # *import-time* config forever: when the database was provisioned (or its AGENT password
+    # converged) after that window, harness.ready stayed false until someone restarted uvicorn by
+    # hand. Opening a Codespace must not need that hand.
+    attempt = 0
+    while True:
+        attempt += 1
         try:
             db.initialize()
             return
-        except Exception:
-            if attempt == 30:
-                return  # status() records the final error; the frontend still serves
-            time.sleep(min(2 * attempt, 10))
+        except Exception as e:
+            # status() records the same first line for /api/health; printing it keeps
+            # /tmp/total-recall-app.log self-explanatory while the database is unreachable.
+            print(f"[warm] harness not ready (attempt {attempt}): {str(e).splitlines()[0][:160]}")
+            time.sleep(min(5 * attempt, 15))
 
 
 @asynccontextmanager

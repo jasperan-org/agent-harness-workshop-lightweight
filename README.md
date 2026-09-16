@@ -30,7 +30,7 @@ Every TODO has a hard-stop assertion immediately below it. Use the [TODO checkli
 1. Create a Codespace from the badge above.
 2. Wait for the post-create step to finish. It installs dependencies, seeds the Oracle `AGENT` schema, and starts the AppBook on port **8000**.
 3. Open [`notebook_student.ipynb`](notebook_student.ipynb) with the Python 3.11+ kernel and run cells from the top.
-4. Open the forwarded **Total Recall AppBook** port at [http://localhost:8000](http://localhost:8000). The app can load while Oracle is still warming; its status badge reports the current state.
+4. Open the forwarded **Total Recall AppBook** port at [http://localhost:8000](http://localhost:8000). The app can load while Oracle is still warming: it keeps retrying and the status badge turns green on its own, with no restart.
 
 Useful recovery commands inside the Codespace:
 

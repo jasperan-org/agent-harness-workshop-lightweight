@@ -344,9 +344,35 @@ def main():
     print("  The appbook can now warm; the notebook will build the rest of the harness.")
 
 
+def main_with_retries(attempts: int = 10, delay: float = 10.0) -> None:
+    """Run main(), retrying the failures a first boot causes.
+
+    A fresh database bounces itself once: ``vector-memory.sh`` allocates the vector pool by
+    setting the parameter and restarting the instance. A provisioning session that is alive at
+    that moment dies with ORA-03113 / ORA-01034, which used to abort this script and leave the
+    Codespace with no usable AGENT user; every later call failed with ORA-01017 until a human
+    re-ran it. Retrying here is what lets a new Codespace provision itself with no hands.
+
+    Credential failures are deliberately *not* retried: they need the repair that
+    ``connect_admin()`` already printed, not patience.
+    """
+    for attempt in range(1, attempts + 1):
+        try:
+            main()
+            return
+        except SystemExit:
+            raise  # unrecoverable (no admin credential): the printed repair is the only fix
+        except Exception as e:  # noqa: BLE001
+            if is_credential_error(e) or attempt == attempts:
+                raise
+            print(f"  …provisioning interrupted ({str(e).splitlines()[0][:120]}); "
+                  f"retrying in {delay:.0f}s ({attempt}/{attempts})")
+            time.sleep(delay)
+
+
 if __name__ == "__main__":
     try:
-        main()
+        main_with_retries()
     except SystemExit:
         raise
     except Exception as e:  # noqa: BLE001
