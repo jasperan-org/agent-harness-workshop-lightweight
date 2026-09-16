@@ -975,6 +975,11 @@ body.has-panel-max { overflow:hidden; }
 
 /* ── Layer 8 · live context engineering (window, retrieval, archive) ────── */
 .cx-log { min-height:210px; max-height:380px; }
+/* These messages are plain text, not the avatar + .bubble markup the older
+   `display:flex` .msg rule was written for, so a rendered answer's heading,
+   list and code block would sit side by side as flex items instead of
+   stacking. Mission Control guards the same case with `.mc-log .msg.mc-msg`. */
+.cx-log .msg { display:block; }
 .cx-readout { display:flex; align-items:baseline; gap:9px; margin-bottom:8px; }
 .cx-readout b { font-family:var(--font-mono); font-size:22px; line-height:1; color:var(--text); }
 .cx-readout .hint { margin-left:auto; font-family:var(--font-mono); font-size:10.5px; color:var(--text-3); }

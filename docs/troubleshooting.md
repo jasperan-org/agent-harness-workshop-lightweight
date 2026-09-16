@@ -394,6 +394,19 @@ See [Part 7 guide](part-7-agent-loop.md) for the exact pattern.
 ---
 
 
+## Appbook UI Issues
+
+### Layer 8 "Ask the agent" answers render as narrow side-by-side columns
+
+**Symptom:** In *Context Engineering*, an answer with more than one block (heading, paragraph, table, list, code) shows those blocks squashed next to each other in one row instead of stacking in the chat bubble. Short or single-block answers look normal, which is why error-only replies never showed it.
+
+**Cause:** The legacy `.msg { display:flex }` rule, written for the original appbook's avatar + `.bubble` markup, also matched Layer 8's plain-text messages. Every block element `renderRich()` emits became a flex item, so the row layout flattened the answer.
+
+**Fix:** `.cx-log .msg { display:block; }` in `app/frontend/styles.css`. Mission Control guards the same case with `.mc-log .msg.mc-msg`; the Layer 4 memory chat still renders through the unguarded `.msg` rule.
+
+---
+
+
 ## Checking System Status
 
 If something isn't working and you're not sure where, run this diagnostic cell:
