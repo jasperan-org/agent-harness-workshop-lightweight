@@ -41,7 +41,7 @@ The AppBook normalizes a bare OCI regional endpoint by adding `/openai/v1`. The 
 
 ## Connect in the notebook
 
-There is no coding TODO in Part 1. Run the import and connection cells from the repository root:
+Part 1 has one small TODO. Run the import and connection cells from the repository root:
 
 ```python
 ORA_DSN    = os.environ.get("ORA_DSN", "localhost:1521/FREEPDB1")
@@ -52,6 +52,18 @@ agent_conn = connect(AGENT_USER, AGENT_PASS, ORA_DSN)
 ```
 
 The `connect` helper retries because a Docker healthcheck can pass before Oracle is ready to accept application sessions. After the connection succeeds, Part 2 creates the OAMP client and begins scanning catalog metadata.
+
+## TODO 1: Talk to the bare model
+
+The chat-client cell ends with your first TODO: set `QUESTION`, run the cell, and read the answer. There is no harness here, no memory, no retrieval, no tools; it is the reasoning core on its own. Remember this baseline, because Part 7 wraps the same call in a context block, retrieved tool schemas, and a dispatch loop.
+
+**Solution:**
+
+```python
+QUESTION = "In one sentence: what does an agent harness add to a language model?"
+```
+
+The checkpoint at the end of the cell fails until `QUESTION` is non-empty and the model answers.
 
 ## Verify the AppBook
 

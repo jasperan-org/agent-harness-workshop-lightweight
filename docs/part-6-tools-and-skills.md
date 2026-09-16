@@ -19,7 +19,7 @@ The canonical notebook keeps a small core set available — `run_sql`, `search_k
 
 ## The `@register` Decorator
 
-§4.1a creates the `toolbox`/`skillbox` tables (idempotent) before this cell runs, so read it before doing the TODO. The decorator is **argument-less** — `@register` introspects the function and writes both the in-memory entry and the `toolbox` row.
+§4.1a creates the `toolbox`/`skillbox` tables (idempotent) before this cell runs, so read it before implementing TODO 6. The decorator is **argument-less** — `@register` introspects the function and writes both the in-memory entry and the `toolbox` row.
 
 ```python
 def register(fn):
@@ -55,7 +55,45 @@ Three things happen:
 
 The `_build_schema` helper requires every tool to have a docstring — without one, retrieval would have nothing to embed. **Always write a docstring.** It is the tool's public spec.
 
-## TODO 4: Register `tool_run_sql`
+## TODO 6: Implement `retrieve_tools`
+
+Retrieval is what keeps the prompt lean: rank the `toolbox` rows by cosine distance to the user query, rerank the shortlist, then merge in the always-on tools so the model never loses the core set.
+
+**Your job:** `retrieve_tools(query, k=6)`:
+
+1. Fetch `k * 4` candidates ordered by `VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :q AS DATA), COSINE)`.
+2. Rerank them with `rerank(...)` and keep the top `k`.
+3. Look each name up in the in-process `TOOLS` dict and append the schemas of `ALWAYS_ON_TOOLS`.
+4. Return the combined list of OpenAI tool schemas.
+
+**Solution:**
+
+```python
+def retrieve_tools(query, k=6):
+    cosine_fetch = k * 4
+    rows = []
+    with agent_conn.cursor() as cur:
+        cur.execute(
+            "SELECT name, description FROM toolbox "
+            f" ORDER BY VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING({ONNX_EMBED_MODEL} USING :q AS DATA), COSINE) "
+            " FETCH FIRST :k ROWS ONLY", q=query, k=cosine_fetch)
+        for name, desc in cur:
+            desc_text = desc.read() if hasattr(desc, "read") else str(desc or "")
+            rows.append({"name": name, "content": desc_text})
+    ranked = rerank(query, rows, top_k=k, content_key="content")
+    schemas = {}
+    for r in ranked:
+        if r["name"] in TOOLS:
+            schemas[r["name"]] = TOOLS[r["name"]][1]
+    for name in ALWAYS_ON_TOOLS:
+        if name in TOOLS:
+            schemas[name] = TOOLS[name][1]
+    return list(schemas.values())
+```
+
+The checkpoint is the `tool_run_sql` checkpoint in Part 6.2, because it must run after `run_sql` has been registered, otherwise the toolbox it searches is empty.
+
+## TODO 7: Register `tool_run_sql`
 
 `run_sql` is the agent's primary way to query live data. It must be **read-only** — `SELECT` and `WITH` only, no DDL, no DML. The agent shouldn't be able to `DROP TABLE` even if a hostile prompt asks it to.
 
@@ -143,6 +181,29 @@ Two procedural-memory tables, parallel structures:
 - The **full body** is one `load_skill(name)` tool call away.
 
 The model sees the menu without paying for the meal.
+
+## TODO 8: Search the skillbox — `tool_list_skills`
+
+`load_skill(name)` reads a skill body once the model knows the name. `tool_list_skills(query, k)` is the discovery half: an HNSW cosine search over `skillbox.embedding`, the same primitive as the toolbox lookup but over prose playbooks.
+
+**Your job:** return a JSON list of the top-k skills with `name`, `category`, and `description`.
+
+**Solution:**
+
+```python
+@register
+def tool_list_skills(query: str, k: int = 5) -> str:
+    """Search the skillbox semantically. Returns top-k skills (name + description)."""
+    with agent_conn.cursor() as cur:
+        cur.execute(
+            "SELECT name, category, description FROM skillbox "
+            f" ORDER BY VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING({ONNX_EMBED_MODEL} USING :q AS DATA), COSINE) "
+            " FETCH FIRST :k ROWS ONLY", q=query, k=k)
+        hits = [{"name": n, "category": c, "description": d} for n, c, d in cur]
+    return json.dumps(hits)
+```
+
+The checkpoint sits in the skill-manifest cell right after the ingestion step, so it searches a populated skillbox when GitHub is reachable and degrades to a shape check when it is not.
 
 ## Key Takeaways — Part 6
 

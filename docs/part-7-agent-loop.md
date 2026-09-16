@@ -31,7 +31,7 @@ The pre-built `SYSTEM_PROMPT` is the agent's job description. It tells the model
 
 These are the rules that turn a model into an *agent*: it grounds itself, uses a constrained tool, persists learning, and exposes uncertainty instead of inventing schema details.
 
-## TODO 5: Implement `agent_turn`
+## TODO 9: Implement `agent_turn`
 
 This is the heart of the harness. Spend time on it — once you understand `agent_turn`, you understand the whole workshop.
 

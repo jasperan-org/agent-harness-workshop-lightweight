@@ -1,4 +1,4 @@
-> **Advanced reference:** This is an advanced reference for the original self-contained workshop build. JSON Relational Duality Views are not required by the current five-TODO notebook or AppBook path.
+> **Advanced reference:** This is an advanced reference for the original self-contained workshop build. JSON Relational Duality Views are not required by the current nine-TODO notebook or AppBook path.
 
 # Part 9: JSON Relational Duality Views
 
@@ -31,7 +31,7 @@ and gets the document back already shaped. Fewer tool turns, fewer hallucinated 
 
 Both are read-only — no `WITH UPDATE` clause, so DML through them is rejected by the kernel.
 
-## TODO 7: Register `tool_get_document`
+## Reference: Register `tool_get_document`
 
 Read one full document from a duality view by primary key. The agent calls this instead of writing JOINs whenever it needs the full shape of an entity.
 

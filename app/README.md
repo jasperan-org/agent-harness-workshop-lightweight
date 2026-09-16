@@ -109,6 +109,6 @@ For a static smoke check without a database, import the app with its dependencie
 
 ## Relationship to the notebook
 
-The canonical notebook is the five-TODO implementation path in the repository root. It teaches the primitives directly. The AppBook is a separate application that exposes the current live layers through probes and a guided UI; it is not a generated notebook frontend and does not require the notebook cells to have been executed first.
+The canonical notebook is the nine-TODO implementation path in the repository root. It teaches the primitives directly. The AppBook is a separate application that exposes the current live layers through probes and a guided UI; it is not a generated notebook frontend and does not require the notebook cells to have been executed first.
 
 Parts 4/5/9/11 of `docs/` document optional advanced Oracle capabilities such as MLE and JSON Relational Duality Views. They remain useful reference material, but are intentionally outside the current AppBook's nine live chapters.

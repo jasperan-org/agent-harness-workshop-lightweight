@@ -25,7 +25,7 @@ The AppBook startup creates a deterministic retail dataset in the `AGENT` schema
 
 The seed comments encode the facts the scanner should make retrievable. In particular, `order_items.discount` is a percentage from 0 to 100, and `v_revenue.net_revenue` is calculated from price, quantity, and that discount. This gives the later agent demo a concrete distinction between schema knowledge (`search_knowledge`) and live facts (`run_sql`).
 
-## TODO 2: Implement `retrieve_knowledge`
+## TODO 4: Implement `retrieve_knowledge`
 
 `retrieve_knowledge(query, k, kinds=None)` is a two-stage call that the agent loop will use on every turn:
 
@@ -80,7 +80,7 @@ def retrieve_knowledge(query: str, k: int = 5,
 
 After you implement it, the next cell scans `AGENT` and runs a probe query. You should see facts for tables such as `AGENT.ORDERS` and columns such as `AGENT.ORDER_ITEMS.DISCOUNT`, with the comments from the seed included when available.
 
-## TODO 3: Implement `hybrid_rrf_search_memories`
+## TODO 5: Implement `hybrid_rrf_search_memories`
 
 Pure vector search is strong on meaning but **under-weights exact tokens**. If the user types an exact column name or an `ORA-00904` error code, they want the row that *literally contains the string*, not one that's vaguely similar.
 
@@ -170,11 +170,11 @@ The hard-stop assert below your implementation runs the SQL against a real query
 
 ## The three-way retrieval probe (just run)
 
-Your `hybrid_rrf_search_memories(query, k)` (TODO 3) returns a list with each hit annotated by `r_vec`, `r_txt`, and `rrf_score`. Run the same query through:
+Your `hybrid_rrf_search_memories(query, k)` (TODO 5) returns a list with each hit annotated by `r_vec`, `r_txt`, and `rrf_score`. Run the same query through:
 
-- `retrieve_knowledge(probe_q, k=3)` — vector only (your TODO 2)
+- `retrieve_knowledge(probe_q, k=3)` — vector only (your TODO 4)
 - `keyword_search_memories(probe_q, k=3)` — Oracle Text only
-- `hybrid_rrf_search_memories(probe_q, k=3)` — fused via RRF (your TODO 3)
+- `hybrid_rrf_search_memories(probe_q, k=3)` — fused via RRF (your TODO 5)
 
 with this query:
 

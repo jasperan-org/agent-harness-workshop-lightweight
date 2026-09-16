@@ -18,7 +18,7 @@ The scanner records its `scan_id` in OAMP metadata so a later run can identify t
 
 ## How OAMP Is Wired Up
 
-The pre-built setup cell wires OAMP with three things you'll see referenced in the Python code:
+The setup cell wires OAMP with three things you'll see referenced in the Python code (the embedder is implemented in TODO 2, defined just above it):
 
 ```python
 memory_client = OracleAgentMemory(
@@ -38,6 +38,31 @@ Three things to notice:
 3. **`extraction_llm`** — OAMP uses the same chat model your agent uses to extract durable memories from threads and maintain a rolling summary.
 
 `schema_policy="create_if_necessary"` means OAMP creates `eda_onnx_memory`, `eda_onnx_thread`, `eda_onnx_record_chunks`, etc. on first use. You never write DDL for memory tables.
+
+## TODO 2: Implement `OracleONNXEmbedder.embed`
+
+OAMP calls the embedder on every write (`add_memory`) and every search, so this method is the vector path for all of long-term memory. The class inherits from OAMP's `IEmbedder`; only `embed` is yours, and `embed_async` delegates to it.
+
+**Your job:** for each text, run one in-database embedding and pack the results into a float32 array of shape `(len(texts), ONNX_EMBED_DIM)`:
+
+```sql
+SELECT VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :t AS DATA) FROM dual
+```
+
+**Solution:**
+
+```python
+    def embed(self, texts, *, is_query=False):
+        out = np.zeros((len(texts), self._dim), dtype=np.float32)
+        sql = f"SELECT VECTOR_EMBEDDING({self._model} USING :t AS DATA) FROM dual"
+        with self._conn.cursor() as cur:
+            for i, t in enumerate(texts):
+                cur.execute(sql, t=t)
+                out[i] = np.asarray(list(cur.fetchone()[0]), dtype=np.float32)
+        return out
+```
+
+There is no network hop and no Python-side model: every vector is computed by the database, and the checkpoint at the end of the cell probes it before the memory client is built.
 
 ## OAMP user and agent IDs (auto-registered)
 
@@ -67,7 +92,7 @@ class Fact:
     metadata: dict   # owner, table, column, etc.
 ```
 
-## TODO 1: Implement `_scan_tables`
+## TODO 3: Implement `_scan_tables`
 
 This is the simplest of the four scanners — and it's the right place to learn the pattern. It mines `ALL_TABLES` joined with `ALL_TAB_COMMENTS` and emits one `Fact(kind="table")` per table.
 

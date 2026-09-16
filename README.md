@@ -8,22 +8,22 @@ Build a memory-aware enterprise data agent on Oracle AI Database 26ai, then insp
 
 There are two deliberately different learning surfaces:
 
-1. **The canonical workshop notebook** — [`notebook_student.ipynb`](notebook_student.ipynb) has five coding TODOs. You implement memory scanning, retrieval, hybrid ranking, a safe SQL tool, and the agent loop. [`notebook_complete.ipynb`](notebook_complete.ipynb) is the answer key.
+1. **The canonical workshop notebook** — [`notebook_student.ipynb`](notebook_student.ipynb) has nine coding TODOs. You implement a bare-model baseline, the in-database embedder, memory scanning, semantic and hybrid retrieval, vector-indexed tool and skill lookup, a safe SQL tool, and the agent loop. [`notebook_complete.ipynb`](notebook_complete.ipynb) is the answer key.
 2. **The Total Recall AppBook** — [`app/`](app/) is a runnable FastAPI + vanilla JavaScript application with nine interactive harness layers. It is a guided demonstration of the ideas after (or alongside) the notebook.
 
 The default demo data is a small retail schema owned by `AGENT`: `customers`, `products`, `orders`, `order_items`, and `v_revenue`. The current AppBook and canonical notebook use this same domain. The older supply-chain implementation is preserved only as advanced reference material in the Part 4/5/9/11 reference guides.
 
-## The five-TODO learning path
+## The nine-TODO learning path
 
 | Block | Topic | Notebook checkpoint |
 |---|---|---|
-| 1 | Setup, Oracle connectivity, and an OpenAI-compatible chat helper | — |
-| 2 | OAMP long-term memory and an Oracle catalog scanner | TODO 1 — `_scan_tables` |
-| 3 | Semantic, reranked, and hybrid vector + Oracle Text retrieval | TODO 2 — `retrieve_knowledge`; TODO 3 — `hybrid_rrf_search_memories` |
-| 4 | Vector-indexed tools and skills | TODO 4 — `tool_run_sql` |
-| 5 | Context engineering and the bounded agent loop | TODO 5 — `agent_turn` |
+| 1 | Setup, Oracle connectivity, and an OpenAI-compatible chat helper | TODO 1 — ask the bare model a question |
+| 2 | OAMP long-term memory and an Oracle catalog scanner | TODO 2 — `OracleONNXEmbedder.embed`; TODO 3 — `_scan_tables` |
+| 3 | Semantic, reranked, and hybrid vector + Oracle Text retrieval | TODO 4 — `retrieve_knowledge`; TODO 5 — `hybrid_rrf_search_memories` |
+| 4 | Vector-indexed tools and skills | TODO 6 — `retrieve_tools`; TODO 7 — `tool_run_sql`; TODO 8 — `tool_list_skills` |
+| 5 | Context engineering and the bounded agent loop | TODO 9 — `agent_turn` |
 
-Every TODO has a hard-stop assertion immediately below it. Use the [TODO checklist](docs/TODO-checklist.md) and the matching guides in [`docs/`](docs/) as you work.
+Every TODO has a hard-stop assertion checkpoint, in the following cell or later in the same section when it must wait for data (registered tools, ingested skills). Use the [TODO checklist](docs/TODO-checklist.md) and the matching guides in [`docs/`](docs/) as you work.
 
 ## Start in GitHub Codespaces
 
@@ -112,15 +112,15 @@ If no chat-model key is configured, the UI reports that explicitly; the database
 
 | Notebook | Role |
 |---|---|
-| [`notebook_student.ipynb`](notebook_student.ipynb) | **Start here.** The five-TODO build path. Self-contained: it provisions the Oracle Text index its keyword leg needs, and runs end to end against the pre-seeded `AGENT` schema. |
-| [`notebook_complete.ipynb`](notebook_complete.ipynb) | The same notebook with all five TODOs solved — the answer key, or a reference to diff your work against. |
+| [`notebook_student.ipynb`](notebook_student.ipynb) | **Start here.** The nine-TODO build path. Self-contained: it provisions the Oracle Text index its keyword leg needs, and runs end to end against the pre-seeded `AGENT` schema. |
+| [`notebook_complete.ipynb`](notebook_complete.ipynb) | The same notebook with all nine TODOs solved — the answer key, or a reference to diff your work against. |
 
 ## Repository map
 
 ```text
 .devcontainer/                 Codespaces compose, bootstrap, and app startup
-notebook_student.ipynb         Entry point: canonical five-TODO student notebook
-notebook_complete.ipynb        The same notebook, all five TODOs solved
+notebook_student.ipynb         Entry point: canonical nine-TODO student notebook
+notebook_complete.ipynb        The same notebook, all nine TODOs solved
 app/                            FastAPI + vanilla JavaScript Total Recall AppBook
 docs/                           Core guides, advanced reference notes, and troubleshooting
 scripts/seed_oracle.py          Safe AGENT-schema/model bootstrap helper
